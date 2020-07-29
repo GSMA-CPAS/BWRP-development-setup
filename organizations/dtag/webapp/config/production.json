@@ -1,0 +1,73 @@
+{
+  "database": {
+    "pooling": true,
+    "connection": {
+      "host": "db-dtag",
+      "port": 3306,
+      "user": "",
+      "password": "",
+      "database": "dtag"
+    }
+  },
+
+  "backendAdapters": {
+    "FabricAdapter": {
+      "config": {
+        "mspid": "DTAG",
+        "channel": "roaming-contracts",
+        "chaincode": "documents",
+        "mutualTls": {
+          "enabled": true,
+          "clientCert": "certs/tls/client.crt",
+          "clientKey": "certs/tls/client.key"
+        },
+        "serviceDiscovery": {
+          "asLocalhost": false
+        },
+        "ca": {
+          "url": "http://ca-dtag:7054",
+          "name": "ca.nomad.com",
+          "adminEnrollmentSecret": "",
+          "userEnrollmentSecret": "",
+          "tlsOptions": {
+            "trustedRoots": [],
+            "verify": false
+          }
+        },
+        "network": {
+          "name": "",
+          "version": "1.0",
+          "channels": {
+            "roaming-contracts": {
+              "peers": {
+                "peer0.dtag.nomad.com": {
+                }
+              }
+            }
+          },
+          "organizations": {
+            "dtag": {
+              "mspid": "DTAG",
+              "peers": [
+                "peer0.dtag.nomad.com"
+              ]
+            }
+          },
+          "peers": {
+            "peer0.dtag.nomad.com": {
+              "url": "grpcs://peer0.dtag.nomad.com:7051",
+              "eventUrl": "grpcs://peer0.dtag.nomad.com:7053",
+              "grpcOptions": {
+                "ssl-target-name-override": "peer0.dtag.nomad.com",
+                "grpc.keepalive_timeout_ms": 20000
+              },
+              "tlsCACerts": {
+                "path": "certs/tls/tlsca.dtag.nomad.com-cert.pem"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

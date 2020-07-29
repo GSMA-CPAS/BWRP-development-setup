@@ -1,0 +1,54 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: nomad.com
+    CA:
+      Country: Germany
+      Province: Bonn
+      Locality: Bonn
+      StreetAddress: Friedrich-Ebert-Allee 140
+      PostalCode: 53113
+    Specs:
+      - Hostname: orderer
+
+PeerOrgs:
+  - Name: DTAG
+    Domain: dtag.nomad.com
+    EnableNodeOUs: true
+    CA:
+      Country: Germany
+      Province: Bonn
+      Locality: Bonn
+      StreetAddress: Friedrich-Ebert-Allee 140
+      PostalCode: 53113
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+
+  - Name: TMUS
+    Domain: tmus.nomad.com
+    EnableNodeOUs: true
+    CA:
+      Country: US
+      Province: Washington
+      Locality: Bellevue
+      StreetAddress: 12920 SE 38th St.
+      PostalCode: 98006
+    Template:
+      Count: 1
+    Users:
+      Count: 1
+
+  - Name: GSMA
+    Domain: gsma.nomad.com
+    EnableNodeOUs: true
+    CA:
+      Country: GB
+      Province: London
+      Locality: London
+      StreetAddress: 120 Fleet St
+      PostalCode: 12345
+    Template:
+      Count: 1
+    Users:
+      Count: 1
