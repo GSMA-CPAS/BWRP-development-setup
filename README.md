@@ -7,7 +7,7 @@
 
 ## Installation
 
-### (1) Clone webbapp repo
+### (1) Clone webapp repo
 
 <pre>
 $ cd nomad
@@ -80,6 +80,8 @@ $ docker-compose up
 
 ### (7) Setup network and webapp
 
+Open new tab in the current terminal
+
 <pre>
 $ cd network-local
 $ ./nomad.sh setup
@@ -94,3 +96,15 @@ Url: https://dtag.poc.com.local
 **TMUS**
 
 Url: https://tmus.poc.com.local
+
+## Create new chaincode package (tar.gz)
+
+Example: create new chaincode package (v1.1.0) for organization DTAG. It will be stored in ``/organizations/dtag/cli/``. This package can later be used for all other organization.
+
+<pre>
+$ ./nomad.sh tty cli-dtag
+$ cd /opt/gopath/src/github.com/chaincode/cc-documents/1.0.0
+$ GO111MODULE=on go mod vendor
+$ cd /opt/gopath/src/github.com/hyperledger/fabric/peer
+$ peer lifecycle chaincode package cli/documents-v1.1.0.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-documents/1.0.0/ --label documents_v1.1.0
+</pre>
