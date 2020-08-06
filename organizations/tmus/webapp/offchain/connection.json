@@ -1,0 +1,40 @@
+{
+    "name": "TMUS",
+    "version": "1.0.0",
+    "client": {
+        "organization": "tmus",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "tmus": {
+            "mspid": "TMUS",
+            "peers": [
+              "peer0.tmus.nomad.com:9051"
+            ],
+            "adminPrivateKey": {
+              "path": "certs/admin/admin.tmus.nomad.com.key"
+            },
+            "signedCert": {
+              "path": "certs/admin/admin.tmus.nomad.com.crt"
+            }
+        }
+    },
+    "peers": {
+        "peer0.tmus.nomad.com:9051": {
+            "url": "grpcs://peer0.tmus.nomad.com:9051",
+            "tlsCACerts": {
+              "path": "certs/tls/tlsca.tmus.nomad.com-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.tmus.nomad.com",
+                "hostnameOverride": "peer0.tmus.nomad.com"
+            }
+        }
+    }
+}

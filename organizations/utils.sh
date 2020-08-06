@@ -5,7 +5,7 @@ ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrga
 ORDERER_CLIENT_CERTFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/nomad.com/users/Admin@nomad.com/tls/client.crt
 ORDERER_CLIENT_KEYFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/nomad.com/users/Admin@nomad.com/tls/client.key
 
-CHAINCODE_NAME="documents"
+CHAINCODE_NAME="offchain"
 CHAINCODE_VERSION="1.0.0"
 
 #PEER_CONN_PARMS="--peerAddresses peer0.dtag.nomad.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dtag.nomad.com/peers/peer0.dtag.nomad.com/tls/ca.crt"

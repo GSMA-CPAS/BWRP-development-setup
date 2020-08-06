@@ -1,0 +1,40 @@
+{
+    "name": "DTAG",
+    "version": "1.0.0",
+    "client": {
+        "organization": "dtag",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "dtag": {
+            "mspid": "DTAG",
+            "peers": [
+              "peer0.dtag.nomad.com:7051"
+            ],
+            "adminPrivateKey": {
+              "path": "certs/admin/admin.dtag.nomad.com.key"
+            },
+            "signedCert": {
+              "path": "certs/admin/admin.dtag.nomad.com.crt"
+            }
+        }
+    },
+    "peers": {
+        "peer0.dtag.nomad.com:7051": {
+            "url": "grpcs://peer0.dtag.nomad.com:7051",
+            "tlsCACerts": {
+              "path": "certs/tls/tlsca.dtag.nomad.com-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.dtag.nomad.com",
+                "hostnameOverride": "peer0.dtag.nomad.com"
+            }
+        }
+    }
+}

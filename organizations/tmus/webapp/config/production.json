@@ -10,7 +10,35 @@
     }
   },
 
+  "services": {
+    "OffChainService": {
+      "enabled": true,
+      "classPath": "/channel/v1/OffChainService",
+      "route": "/api/v1/offchain",
+      "useBackendAdapters": [
+        {"type": "offchain", "name": "HLFOffChainAdapter"}
+      ]
+    }
+  },
+
   "backendAdapters": {
+    "HLFOffChainAdapter": {
+      "classPath": "/adapters/blockchain/fabric/v1/HLFOffChainAdapter",
+      "config": {
+        "ccp": "offchain/connection.json",
+        "serviceDiscovery": {
+          "enabled": true,
+          "asLocalhost": false
+        },
+        "channel": "roaming-contracts",
+        "chaincode": "offchain",
+        "mutualTls": {
+          "enabled": true,
+          "clientCert": "certs/tls/client.crt",
+          "clientKey": "certs/tls/client.key"
+        }
+      }
+    },
     "FabricAdapter": {
       "config": {
         "mspid": "TMUS",

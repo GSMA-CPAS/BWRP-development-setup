@@ -1,4 +1,4 @@
-# Local Network
+# Local Network (offchain prototype)
 
 ## Requirements
 
@@ -11,7 +11,7 @@
 
 <pre>
 $ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/webapp.git
+$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/webapp.git -b offchain_prototype
 </pre>
 
 ### (2) Build webapp docker image
@@ -25,7 +25,7 @@ $ docker build --no-cache -t webapp:1.0.0 .
 
 <pre>
 $ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/network-local.git
+$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/network-local.git -b offchain_prototype
 </pre>
 
 ### (4) Create ``.env`` file in network-local (example .env-template)
@@ -97,14 +97,53 @@ Url: https://dtag.poc.com.local
 
 Url: https://tmus.poc.com.local
 
+## Test offchain communication
+
+Query SetSQLDBConn to configure the chaincode to read/write to mysql database.
+
+<pre>
+$ ./nomad.sh query dtag peer0
+$ ./nomad.sh query tmus peer0
+</pre>
+
+Enter CLI container of organization DTAG:
+
+<pre>
+$ ./nomad.sh tty cli-dtag
+</pre>
+
+Install curl:
+
+<pre>
+$ apk --no-cache add curl
+</pre>
+
+SetData:
+
+<pre>
+$ curl -v -X POST "http://webapp-dtag:3000/api/v1/offchain/setData/abcd?org=TMUS" -d'{"hello":"world"}'
+</pre>
+
+GetData:
+
+<pre>
+$ curl -v -X GET "http://webapp-dtag:3000/api/v1/offchain/getData/abcd?org=TMUS&val=true"
+</pre>
+
+VerifyRemote:
+
+<pre>
+$ curl -v -X GET "http://webapp-dtag:3000/api/v1/offchain/verifyRemote/abcd?org=TMUS"
+</pre>
+
 ## Create new chaincode package (tar.gz)
 
 Example: create new chaincode package (v1.1.0) for organization DTAG. It will be stored in ``/organizations/dtag/cli/``. This package can later be used for all other organization.
 
 <pre>
 $ ./nomad.sh tty cli-dtag
-$ cd /opt/gopath/src/github.com/chaincode/cc-documents/1.0.0
+$ cd /opt/gopath/src/github.com/chaincode/offchain/1.0.0
 $ GO111MODULE=on go mod vendor
 $ cd /opt/gopath/src/github.com/hyperledger/fabric/peer
-$ peer lifecycle chaincode package cli/documents-v1.1.0.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-documents/1.0.0/ --label documents_v1.1.0
+$ peer lifecycle chaincode package cli/offchain-v1.0.0.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-offchain/1.0.0/ --label offchain_v1.1.0
 </pre>
