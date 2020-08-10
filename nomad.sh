@@ -13,6 +13,7 @@ function printHelp() {
   echo "  nomad.sh info <org> <peer>"
   echo "  nomad.sh tty <container-name>"
   echo "  nomad.sh down"
+  echo "  nomad.sh destroy"
   echo
 }
 
@@ -108,6 +109,15 @@ function tty() {
   docker exec -ti --user root $CONTAINER_ID_OR_NAME /bin/sh
 }
 
+function destroy(){
+  # drop all images
+  docker rmi $(docker images -q)
+  # stop all containers
+  docker stop $(docker ps -a -q)
+  # delete containers
+  docker rm $(docker ps -a -q)
+}
+
 function down() {
   #docker stop $(docker ps -a -q)
   docker stop $(docker ps -a | grep 'hyperledger\|dev-peer\|mysql\|nginx' | awk '{print $1}')
@@ -150,6 +160,8 @@ elif [ "${MODE}" == "tty" ]; then
   tty $1
 elif [ "${MODE}" == "down" ]; then
   down
+elif [ "${MODE}" == "destroy" ]; then
+  destroy
 else
   printHelp
   exit 1
