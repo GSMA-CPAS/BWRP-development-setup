@@ -1,6 +1,7 @@
 package offchain
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -101,8 +102,56 @@ func TestStoreSignature(t *testing.T) {
 	//response, err := contract.SetSQLDBConn(transactionContext, "192.168.0.40", "3306", "nomad", "nomad", "private_db")
 
 	// local store operation
-	err = contract.StoreSignature(transactionContext, "0x01234KEY", "SHA3", []byte("\x1234"))
+	key := "0x01234KEY"
+	err = contract.StoreSignature(transactionContext, key, "SHA3", []byte("\x1234"))
 	require.NoError(t, err)
 
+	dumpAllStates(t, chaincodeStub)
+	dumpCompositeKey(t, chaincodeStub, "owner~type~key")
+
+	checkState(t, chaincodeStub, "owner~type~key", "123")
+
 	//require.Equal(t, "OK", response.Status, "Status unexpected")
+}
+
+func dumpAllStates(t *testing.T, stub *mocks.ChaincodeStub) {
+	keysIter, err := stub.GetStateByRange("\x00", "z")
+	require.NoError(t, err)
+	if keysIter == nil {
+		fmt.Printf("> no results found")
+		return
+	}
+
+	defer keysIter.Close()
+
+	for keysIter.HasNext() {
+		resp, iterErr := keysIter.Next()
+		require.NoError(t, iterErr)
+		require.NotNil(t, resp)
+		fmt.Printf("ledger[%s] = %s\n", resp.Key, resp.Value)
+	}
+}
+
+func dumpCompositeKey(t *testing.T, stub *mocks.ChaincodeStub, compositeKey string) {
+	fmt.Printf("> dumping composite key '%s'\n", compositeKey)
+
+	myIterator, err := stub.GetStateByPartialCompositeKey(compositeKey, []string{"org1MSP"})
+	require.NoError(t, err)
+	require.NotNil(t, myIterator)
+	defer myIterator.Close()
+
+	for myIterator.HasNext() {
+		resp, err := myIterator.Next()
+		require.NoError(t, err)
+
+		fmt.Printf("ledger[%s] = %s\n", resp.Key, resp.Value)
+	}
+}
+
+// based on ideas from https://medium.com/coinmonks/tutorial-on-hyperledger-fabrics-chaincode-testing-44c3f260cb2b
+func checkState(t *testing.T, stub *mocks.ChaincodeStub, name string, value string) {
+	bytes, err := stub.GetState(name)
+	require.NoError(t, err)
+	require.NotNil(t, bytes)
+	require.EqualValues(t, string(bytes), value)
 }
