@@ -38,6 +38,53 @@ type SmartContract struct {
 	contractapi.Contract
 }
 
+// GetStorageLocation returns the storage location for
+// a given storageType and key by using the composite key feature
+func GetStorageLocation(ctx contractapi.TransactionContextInterface, storageType string, key string) (string, error) {
+	// fetch calling MSP
+	callerID, err := GetCallerMSPID(ctx)
+	if err != nil {
+		log.Errorf("failed to fetch callerid: %s", err.Error())
+		return "", err
+	}
+
+	// construct the storage location
+	indexName := "owner~type~key"
+	storageLocation, err := ctx.GetStub().CreateCompositeKey(indexName, []string{callerID, storageType, key})
+	if err != nil {
+		log.Errorf("failed to create composite key: %s", err.Error())
+		return "", err
+	}
+	return storageLocation, nil
+}
+
+func authenticateCallerCanSign() bool {
+	// TODO!
+	return true
+}
+
+// StoreSignature stores a given signature on the ledger
+func (s *SmartContract) StoreSignature(ctx contractapi.TransactionContextInterface, key string, algorithm string, signature []byte) error {
+	// fetch storage location where we will store signatures
+	// in this case use "SIGNATURE_<ALGO>" as data type
+	storageLocation, err := GetStorageLocation(ctx, "SIGNATURE_"+algorithm, key)
+	if err != nil {
+		log.Errorf("failed to fetch storageLocation: %s", err.Error())
+		return err
+	}
+
+	// check authorization
+	if !authenticateCallerCanSign() {
+		return fmt.Errorf("caller is not allowed to sign. access denied")
+	}
+
+	// IDEA/CHECK with martin:
+	// instead of manually appending data (i.e. ledger[key] = ledger[key] . {newdata} )
+	// we could just overwrite data and use getHistoryForKey(key) to retrieve all values?
+	// NOTE: this method requires peer configuration core.ledger.history.enableHistoryDatabase to be true!
+	return ctx.GetStub().PutState(storageLocation, signature)
+}
+
 // StorePayload will store the given payload in the local db via a ReST call
 func StorePayload(partnerMSP string, data string) error {
 	// send data via a REST request to the DB
@@ -65,18 +112,10 @@ func StorePayload(partnerMSP string, data string) error {
 	return nil
 }
 
-// GetCallerMSP returns the caller MSPID
+// GetCallerMSPID returns the caller MSPID
 func GetCallerMSPID(ctx contractapi.TransactionContextInterface) (string, error) {
-
-	// fetch cid
-	cid, err := cid.New(ctx.GetStub())
-	if err != nil {
-		log.Errorf("failed to fetch cid: %s", err.Error())
-		return "", err
-	}
-
 	// fetch callers MSP name
-	msp, err := cid.GetMSPID()
+	msp, err := cid.GetMSPID(ctx.GetStub())
 	if err != nil {
 		log.Errorf("failed to get caller MSPID: %s", err.Error())
 		return "", err

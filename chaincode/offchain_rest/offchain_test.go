@@ -52,6 +52,7 @@ func setCreator(t *testing.T, stub *mocks.ChaincodeStub, mspID string, idbytes [
 	stub.GetCreatorReturns(b, err)
 	require.NoError(t, err)
 }
+
 func TestPutData(t *testing.T) {
 	chaincodeStub := &mocks.ChaincodeStub{}
 	setCreator(t, chaincodeStub, "org1MSP", []byte(cert))
@@ -80,6 +81,28 @@ func TestPutData(t *testing.T) {
 	os.Setenv("CORE_PEER_LOCALMSPID", "org3MSP")
 	err = contract.StorePrivateData(transactionContext, "org2MSP", "data")
 	require.Error(t, err)
+
+	//require.Equal(t, "OK", response.Status, "Status unexpected")
+}
+
+func TestStoreSignature(t *testing.T) {
+	chaincodeStub := &mocks.ChaincodeStub{}
+	setCreator(t, chaincodeStub, "org1MSP", []byte(cert))
+	clientID, err := cid.New(chaincodeStub)
+	require.NoError(t, err)
+	transactionContext := &mocks.TransactionContext{}
+	transactionContext.GetStubReturns(chaincodeStub)
+	transactionContext.GetClientIdentityReturns(clientID)
+	contract := SmartContract{}
+
+	mspid, err := clientID.GetMSPID()
+	require.NoError(t, err)
+	os.Setenv("CORE_PEER_LOCALMSPID", mspid)
+	//response, err := contract.SetSQLDBConn(transactionContext, "192.168.0.40", "3306", "nomad", "nomad", "private_db")
+
+	// local store operation
+	err = contract.StoreSignature(transactionContext, "0x01234KEY", "SHA3", []byte("\x1234"))
+	require.NoError(t, err)
 
 	//require.Equal(t, "OK", response.Status, "Status unexpected")
 }
