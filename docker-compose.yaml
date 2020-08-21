@@ -171,9 +171,9 @@ services:
     networks:
       - nomad
 
-  webapp-dtag:
-    container_name: webapp-dtag
-    image: webapp:${WEBAPP_VERSION}
+  restadapter-dtag:
+    container_name: restadapter-dtag
+    image: restadapter:${REST_ADAPTER_VERSION}
     restart: always
     environment:
       DTAG_MYSQL_USER: ${DTAG_MYSQL_USER}
@@ -325,9 +325,9 @@ services:
     networks:
       - nomad
 
-  webapp-tmus:
-    container_name: webapp-tmus
-    image: webapp:${WEBAPP_VERSION}
+  restadapter-tmus:
+    container_name: restadapter-tmus
+    image: restadapter:${REST_ADAPTER_VERSION}
     restart: always
     environment:
       TMUS_MYSQL_USER: ${TMUS_MYSQL_USER}
