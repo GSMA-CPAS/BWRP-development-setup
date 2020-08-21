@@ -86,13 +86,13 @@ func StoreData(ctx contractapi.TransactionContextInterface, key string, dataType
 }
 
 // StoreSignature stores a given signature on the ledger
-func (s *RoamingSmartContract) StoreSignature(ctx contractapi.TransactionContextInterface, key string, algorithm string, signature []byte) error {
+func (s *RoamingSmartContract) StoreSignature(ctx contractapi.TransactionContextInterface, key string, signatureJSON string) error {
 	// check authorization
 	if !authenticateCallerCanSign() {
 		return fmt.Errorf("caller is not allowed to sign. access denied")
 	}
 
-	return StoreData(ctx, key, "SIGNATURE_"+algorithm, signature)
+	return StoreData(ctx, key, "SIGNATURE", []byte(signatureJSON))
 }
 
 func getRestURI() string {
@@ -120,10 +120,15 @@ func getCallerMSPID(ctx contractapi.TransactionContextInterface) (string, error)
 
 /*
 CreateSignature(document):
+TODO: to in API
 -	Query function
 -	Creates signature over data using globally defined signature algorithm with caller’s HLF key
 -	Returns signature, signature_algorithm
 crypto/ed25519 - Golang
+{algorithm: ed25519
+identity: User1@org1
+publicCert: X509Certificate
+signature: signature}
 */
 
 // StoreDocument will store contract Data locally
