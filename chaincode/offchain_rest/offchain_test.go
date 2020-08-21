@@ -1,6 +1,9 @@
 package offchain
 
+//see https://github.com/hyperledger/fabric-samples/blob/master/asset-transfer-basic/chaincode-go/chaincode/smartcontract_test.go
+
 import (
+	"encoding/hex"
 	"fmt"
 	"os"
 	"testing"
@@ -10,8 +13,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
+	"github.com/hyperledger/fabric-chaincode-go/shimtest"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/hyperledger/fabric-protos-go/msp"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,7 +67,7 @@ func TestPutData(t *testing.T) {
 	transactionContext := &mocks.TransactionContext{}
 	transactionContext.GetStubReturns(chaincodeStub)
 	transactionContext.GetClientIdentityReturns(clientID)
-	contract := SmartContract{}
+	contract := RoamingSmartContract{}
 
 	mspid, err := clientID.GetMSPID()
 	require.NoError(t, err)
@@ -86,32 +91,127 @@ func TestPutData(t *testing.T) {
 	//require.Equal(t, "OK", response.Status, "Status unexpected")
 }
 
+type ledgerEntry []byte
+
+var ledger map[string][]ledgerEntry = make(map[string][]ledgerEntry)
+
+func dumpLedger() {
+	for key, val := range ledger {
+		fmt.Printf("LEDGER[%q] = ", key)
+		for _, entry := range val {
+			fmt.Printf("[%q], ", string(entry))
+		}
+		fmt.Printf("\n")
+	}
+}
+
+func myPutState(arg1 string, arg2 []byte) error {
+	log.Infof("WRITE ledger[%s] = %s\n", arg1, string(arg2))
+
+	// insert into ledger, append to state
+	value, ok := ledger[arg1]
+	if !ok {
+		ledger[arg1] = make([]ledgerEntry, 0)
+	}
+	// add data
+	ledger[arg1] = append(value, arg2)
+
+	dumpLedger()
+
+	return nil
+}
+
+/*
+func myGetState(arg1 string) ([]byte, error) {
+	log.Infof("READ ledger[%s]\n", arg1)
+
+	// query data from store
+	value, ok := ledger[arg1]
+	if !ok {
+		return error
+		ledger[arg1] = make([]ledgerEntry, 0)
+	}
+	// add data
+	ledger[arg1] = append(value, arg2)
+
+	dumpLedger()
+
+	return nil
+}*/
+
+func shimSetCreator(t *testing.T, stub *shimtest.MockStub, mspID string, idbytes []byte) {
+	sid := &msp.SerializedIdentity{Mspid: mspID, IdBytes: idbytes}
+	b, err := proto.Marshal(sid)
+	if err != nil {
+		t.FailNow()
+	}
+	stub.Creator = b
+}
 func TestStoreSignature(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
+	shimStub := shimtest.NewMockStub("Test", nil)
+
+	//clientID, err := cid.New(mockStub)
+	//require.NoError(t, err)
+	//transactionContext := &mocks.TransactionContext{}
+
+	// test put and get state:
+	shimStub.MockTransactionStart("init")
+	shimStub.PutState("test", []byte("test"))
+	shimStub.MockTransactionEnd("init")
+
+	res, err := shimStub.GetState("test")
+	require.NoError(t, err)
+	if err != nil {
+		log.Errorf("ERROR")
+	}
+	log.Infof("READ [%q]\n", hex.EncodeToString(res))
+
+	shimSetCreator(t, shimStub, "org1MSP", []byte(cert))
+
+	_, err = cid.New(shimStub)
+	require.NoError(t, err)
+
+	/*chaincodeStub := &mocks.ChaincodeStub{}
 	setCreator(t, chaincodeStub, "org1MSP", []byte(cert))
+
 	clientID, err := cid.New(chaincodeStub)
 	require.NoError(t, err)
 	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
+
+	// tell the mock setup what to return
+	transactionContext.GetStubReturns(mockStub)
 	transactionContext.GetClientIdentityReturns(clientID)
-	contract := SmartContract{}
+
+	// tell the mock which functions to use
+	chaincodeStub.CreateCompositeKeyCalls(shim.CreateCompositeKey)
+	chaincodeStub.PutStateCalls(myPutState)
+
+	contract := RoamingSmartContract{}
 
 	mspid, err := clientID.GetMSPID()
 	require.NoError(t, err)
 	os.Setenv("CORE_PEER_LOCALMSPID", mspid)
 	//response, err := contract.SetSQLDBConn(transactionContext, "192.168.0.40", "3306", "nomad", "nomad", "private_db")
 
+	res, err := transactionContext.GetStub().CreateCompositeKey("name~id", []string{"me", "123"})
+	fmt.Printf("got %s\n", hex.EncodeToString([]byte(res)))
+
+	//chaincodeStub.PutState(res, []byte("\x1234"))
+	//bb, err := chaincodeStub.GetState(res)
+	//fmt.Printf("readback %s\n", hex.EncodeToString(bb))
+
 	// local store operation
 	key := "0x01234KEY"
 	err = contract.StoreSignature(transactionContext, key, "SHA3", []byte("\x1234"))
 	require.NoError(t, err)
 
-	dumpAllStates(t, chaincodeStub)
-	dumpCompositeKey(t, chaincodeStub, "owner~type~key")
+	//dumpAllStates(t, chaincodeStub)
+	//dumpCompositeKey(t, chaincodeStub, "owner~type~key")
 
-	checkState(t, chaincodeStub, "owner~type~key", "123")
+	//checkState(t, chaincodeStub, "owner~type~key", "123")
 
 	//require.Equal(t, "OK", response.Status, "Status unexpected")
+	*/
 }
 
 func dumpAllStates(t *testing.T, stub *mocks.ChaincodeStub) {

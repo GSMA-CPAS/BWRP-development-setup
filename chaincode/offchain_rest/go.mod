@@ -10,6 +10,7 @@ require (
 	github.com/hyperledger/fabric-contract-api-go v1.1.0
 	github.com/hyperledger/fabric-protos-go v0.0.0-20200804194919-0c472b9cf543
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
+	github.com/s7techlab/cckit v0.6.14
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.6.1
 	google.golang.org/protobuf v1.23.0

@@ -4,6 +4,7 @@
 package offchain
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -20,7 +21,7 @@ func main() {
 	log.SetLevel(log.DebugLevel)
 
 	// instantiate chaincode
-	chaincode, err := contractapi.NewChaincode(new(SmartContract))
+	chaincode, err := contractapi.NewChaincode(new(RoamingSmartContract))
 	if err != nil {
 		log.Panicf("failed to create chaincode: %s", err.Error())
 		return
@@ -33,8 +34,8 @@ func main() {
 	}
 }
 
-// SmartContract creates a new hlf contract api
-type SmartContract struct {
+// RoamingSmartContract creates a new hlf contract api
+type RoamingSmartContract struct {
 	contractapi.Contract
 }
 
@@ -51,10 +52,14 @@ func GetStorageLocation(ctx contractapi.TransactionContextInterface, storageType
 	// construct the storage location
 	indexName := "owner~type~key"
 	storageLocation, err := ctx.GetStub().CreateCompositeKey(indexName, []string{callerID, storageType, key})
+
 	if err != nil {
 		log.Errorf("failed to create composite key: %s", err.Error())
 		return "", err
 	}
+
+	log.Infof("got composite key for <%s> = 0x%s", indexName, hex.EncodeToString([]byte(storageLocation)))
+
 	return storageLocation, nil
 }
 
@@ -63,26 +68,31 @@ func authenticateCallerCanSign() bool {
 	return true
 }
 
-// StoreSignature stores a given signature on the ledger
-func (s *SmartContract) StoreSignature(ctx contractapi.TransactionContextInterface, key string, algorithm string, signature []byte) error {
-	// fetch storage location where we will store signatures
-	// in this case use "SIGNATURE_<ALGO>" as data type
-	storageLocation, err := GetStorageLocation(ctx, "SIGNATURE_"+algorithm, key)
+// StoreData stores given data with a given type on the ledger
+func StoreData(ctx contractapi.TransactionContextInterface, key string, dataType string, data []byte) error {
+	// fetch storage location where we will store the data
+	storageLocation, err := GetStorageLocation(ctx, dataType, key)
 	if err != nil {
 		log.Errorf("failed to fetch storageLocation: %s", err.Error())
 		return err
-	}
-
-	// check authorization
-	if !authenticateCallerCanSign() {
-		return fmt.Errorf("caller is not allowed to sign. access denied")
 	}
 
 	// IDEA/CHECK with martin:
 	// instead of manually appending data (i.e. ledger[key] = ledger[key] . {newdata} )
 	// we could just overwrite data and use getHistoryForKey(key) to retrieve all values?
 	// NOTE: this method requires peer configuration core.ledger.history.enableHistoryDatabase to be true!
-	return ctx.GetStub().PutState(storageLocation, signature)
+	log.Infof("will store data of type %s on ledger: state[%s] = 0x%s", dataType, storageLocation, hex.EncodeToString(data))
+	return ctx.GetStub().PutState(storageLocation, data)
+}
+
+// StoreSignature stores a given signature on the ledger
+func (s *RoamingSmartContract) StoreSignature(ctx contractapi.TransactionContextInterface, key string, algorithm string, signature []byte) error {
+	// check authorization
+	if !authenticateCallerCanSign() {
+		return fmt.Errorf("caller is not allowed to sign. access denied")
+	}
+
+	return StoreData(ctx, key, "SIGNATURE_"+algorithm, signature)
 }
 
 // StorePayload will store the given payload in the local db via a ReST call
@@ -128,7 +138,7 @@ func GetCallerMSPID(ctx contractapi.TransactionContextInterface) (string, error)
 // StorePrivateData will store contract Data locally
 // this can be called on a remote peer or locally.
 // it will store the private data on the called peer
-func (s *SmartContract) StorePrivateData(ctx contractapi.TransactionContextInterface, partnerMSPID string, data string) error {
+func (s *RoamingSmartContract) StorePrivateData(ctx contractapi.TransactionContextInterface, partnerMSPID string, data string) error {
 	// fetch local MSPID
 	localMSPID := os.Getenv("CORE_PEER_LOCALMSPID")
 
@@ -139,7 +149,7 @@ func (s *SmartContract) StorePrivateData(ctx contractapi.TransactionContextInter
 		return err
 	}
 
-	log.Infof(">> got MSPs, local = %s, caller = %s, partner = %s", localMSPID, callerMSPID, partnerMSPID)
+	log.Infof("got MSP IDs: local = %s, caller = %s, partner = %s", localMSPID, callerMSPID, partnerMSPID)
 
 	// make sure this is called on the proper peers
 	if localMSPID == partnerMSPID {
