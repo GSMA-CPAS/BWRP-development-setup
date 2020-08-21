@@ -4,6 +4,7 @@
 package offchain
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
@@ -15,6 +16,8 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
 )
+
+const compositeKeyDefinition string = "owner~type~key"
 
 func main() {
 	// set loglevel
@@ -37,6 +40,44 @@ func main() {
 // RoamingSmartContract creates a new hlf contract api
 type RoamingSmartContract struct {
 	contractapi.Contract
+}
+
+// CreateSecretKey returns the hidden key used for hidden communication
+func CreateSecretKey(document string, targetMSPID string) string {
+	hash := sha256.Sum256([]byte(targetMSPID + document))
+	return hex.EncodeToString(hash[:])
+}
+
+// GetSignatures returns all signatures stored in the ledger for this key
+func GetSignatures(ctx contractapi.TransactionContextInterface, targetMSPID string, key string) ([]string, error) {
+	storageType := "SIGNATURE"
+	storageLocation, err := ctx.GetStub().CreateCompositeKey(compositeKeyDefinition, []string{targetMSPID, storageType, key})
+
+	if err != nil {
+		log.Errorf("failed to fetch storageLocation: %s", err.Error())
+		return nil, err
+	}
+
+	iterator, err := ctx.GetStub().GetHistoryForKey(storageLocation)
+	if iterator == nil {
+		log.Infof("no results found")
+		return nil, fmt.Errorf("GetHistoryForKey found no results")
+	}
+
+	results := make([]string, 1)
+
+	for iterator.HasNext() {
+		historyItem, err := iterator.Next()
+		if err != nil {
+			log.Errorf("failed to iterate history: %s", err.Error())
+			return nil, err
+		}
+		if !historyItem.GetIsDelete() {
+			results = append(results, string(historyItem.GetValue()))
+		}
+	}
+
+	return results, nil
 }
 
 // GetStorageLocation returns the storage location for
@@ -128,7 +169,7 @@ crypto/ed25519 - Golang
 
 // StoreDocument will store contract Data locally
 // this can be called on a remote peer or locally
-func (s *RoamingSmartContract) StoreDocument(ctx contractapi.TransactionContextInterface, targetMSPID string, data string) error {
+func (s *RoamingSmartContract) StorePrivateDocument(ctx contractapi.TransactionContextInterface, targetMSPID string, data string) error {
 	// get the caller MSPID
 	callerMSPID, err := getCallerMSPID(ctx)
 	if err != nil {

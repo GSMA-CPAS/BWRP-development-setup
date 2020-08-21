@@ -55,6 +55,51 @@ func setCreator(t *testing.T, stub *shimtest.MockStub, mspID string, idbytes []b
 	stub.Creator = b
 }
 
+func TestGetAllSignatures(t *testing.T) {
+	document := "mydocument"
+
+	contract := RoamingSmartContract{}
+	shimStub := shimtest.NewMockStub("Test", nil)
+
+	setCreator(t, shimStub, "org1MSP", []byte(cert))
+
+	clientID, err := cid.New(shimStub)
+	require.NoError(t, err)
+	transactionContext := &mocks.TransactionContext{}
+
+	transactionContext.GetStubReturns(shimStub)
+	transactionContext.GetClientIdentityReturns(clientID)
+
+	key1 := CreateSecretKey(document, "org1MSP")
+
+	// start tx
+	shimStub.MockTransactionStart("txid_dummy_init1")
+	// store signature
+	err = contract.StoreSignature(transactionContext, key1, "{ 'payload' : '1', 'signature' : '0xabcd'}")
+	require.NoError(t, err)
+	// execute tx
+	shimStub.MockTransactionEnd("txid_dummy_init1")
+
+	// start tx
+	shimStub.MockTransactionStart("txid_dummy_init2")
+	// store signature
+	err = contract.StoreSignature(transactionContext, key1, "{ 'payload' : '2', 'signature' : '0xabcd'}")
+	require.NoError(t, err)
+	// execute tx
+	shimStub.MockTransactionEnd("txid_dummy_init2")
+
+	// debug
+	dumpAllPartialStates(t, shimStub, "owner~type~key")
+
+	signatures, err := GetSignatures(transactionContext, "org1MSP", key1)
+	require.NoError(t, err)
+
+	for i, val := range signatures {
+		log.Infof("signature[%d] = %q\n", i, val)
+	}
+
+}
+
 func TestStoreSignature(t *testing.T) {
 	contract := RoamingSmartContract{}
 	shimStub := shimtest.NewMockStub("Test", nil)
@@ -80,41 +125,6 @@ func TestStoreSignature(t *testing.T) {
 	shimStub.MockTransactionEnd("txid_dummy_init")
 
 	dumpAllPartialStates(t, shimStub, "owner~type~key")
-
-	/*chaincodeStub := &mocks.ChaincodeStub{}
-
-	// tell the mock setup what to return
-
-	// tell the mock which functions to use
-	chaincodeStub.CreateCompositeKeyCalls(shim.CreateCompositeKey)
-	chaincodeStub.PutStateCalls(myPutState)
-
-	contract := RoamingSmartContract{}
-
-	mspid, err := clientID.GetMSPID()
-	require.NoError(t, err)
-	os.Setenv("CORE_PEER_LOCALMSPID", mspid)
-	//response, err := contract.SetSQLDBConn(transactionContext, "192.168.0.40", "3306", "nomad", "nomad", "private_db")
-
-	res, err := transactionContext.GetStub().CreateCompositeKey("name~id", []string{"me", "123"})
-	fmt.Printf("got %s\n", hex.EncodeToString([]byte(res)))
-
-	//chaincodeStub.PutState(res, []byte("\x1234"))
-	//bb, err := chaincodeStub.GetState(res)
-	//fmt.Printf("readback %s\n", hex.EncodeToString(bb))
-
-	// local store operation
-	key := "0x01234KEY"
-	err = contract.StoreSignature(transactionContext, key, "SHA3", []byte("\x1234"))
-	require.NoError(t, err)
-
-	//dumpAllStates(t, chaincodeStub)
-	//dumpCompositeKey(t, chaincodeStub, "owner~type~key")
-
-	//checkState(t, chaincodeStub, "owner~type~key", "123")
-
-	//require.Equal(t, "OK", response.Status, "Status unexpected")
-	*/
 }
 
 func TestPutAndGetState(t *testing.T) {
