@@ -5,7 +5,6 @@ package offchain
 import (
 	"encoding/hex"
 	"fmt"
-	"os"
 	"testing"
 
 	"chaincode/offchain_rest/mocks"
@@ -48,18 +47,16 @@ type transactionContext interface {
 	contractapi.TransactionContextInterface
 }
 
-func setCreator(t *testing.T, stub *mocks.ChaincodeStub, mspID string, idbytes []byte) {
-	var err error
+func setCreator(t *testing.T, stub *shimtest.MockStub, mspID string, idbytes []byte) {
 	sid := &msp.SerializedIdentity{Mspid: mspID, IdBytes: idbytes}
 	b, err := proto.Marshal(sid)
 	if err != nil {
 		t.FailNow()
 	}
-	stub.GetCreatorReturns(b, err)
-	require.NoError(t, err)
+	stub.Creator = b
 }
 
-func TestPutData(t *testing.T) {
+/*func TestPutData(t *testing.T) {
 	chaincodeStub := &mocks.ChaincodeStub{}
 	setCreator(t, chaincodeStub, "org1MSP", []byte(cert))
 	clientID, err := cid.New(chaincodeStub)
@@ -89,64 +86,8 @@ func TestPutData(t *testing.T) {
 	require.Error(t, err)
 
 	//require.Equal(t, "OK", response.Status, "Status unexpected")
-}
-
-type ledgerEntry []byte
-
-var ledger map[string][]ledgerEntry = make(map[string][]ledgerEntry)
-
-func dumpLedger() {
-	for key, val := range ledger {
-		fmt.Printf("LEDGER[%q] = ", key)
-		for _, entry := range val {
-			fmt.Printf("[%q], ", string(entry))
-		}
-		fmt.Printf("\n")
-	}
-}
-
-func myPutState(arg1 string, arg2 []byte) error {
-	log.Infof("WRITE ledger[%s] = %s\n", arg1, string(arg2))
-
-	// insert into ledger, append to state
-	value, ok := ledger[arg1]
-	if !ok {
-		ledger[arg1] = make([]ledgerEntry, 0)
-	}
-	// add data
-	ledger[arg1] = append(value, arg2)
-
-	dumpLedger()
-
-	return nil
-}
-
-/*
-func myGetState(arg1 string) ([]byte, error) {
-	log.Infof("READ ledger[%s]\n", arg1)
-
-	// query data from store
-	value, ok := ledger[arg1]
-	if !ok {
-		return error
-		ledger[arg1] = make([]ledgerEntry, 0)
-	}
-	// add data
-	ledger[arg1] = append(value, arg2)
-
-	dumpLedger()
-
-	return nil
 }*/
 
-func shimSetCreator(t *testing.T, stub *shimtest.MockStub, mspID string, idbytes []byte) {
-	sid := &msp.SerializedIdentity{Mspid: mspID, IdBytes: idbytes}
-	b, err := proto.Marshal(sid)
-	if err != nil {
-		t.FailNow()
-	}
-	stub.Creator = b
-}
 func TestStoreSignature(t *testing.T) {
 	shimStub := shimtest.NewMockStub("Test", nil)
 
@@ -166,7 +107,7 @@ func TestStoreSignature(t *testing.T) {
 	}
 	log.Infof("READ [%q]\n", hex.EncodeToString(res))
 
-	shimSetCreator(t, shimStub, "org1MSP", []byte(cert))
+	setCreator(t, shimStub, "org1MSP", []byte(cert))
 
 	_, err = cid.New(shimStub)
 	require.NoError(t, err)
