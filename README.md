@@ -7,18 +7,18 @@
 
 ## Installation
 
-### (1) Clone webapp repo
+### (1) Clone restadapter repo
 
 <pre>
 $ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/webapp.git -b offchain_prototype
+$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/restadapter.git
 </pre>
 
-### (2) Build webapp docker image
+### (2) Build restadapter docker image
 
 <pre>
 $ cd nomad/webapp
-$ docker build --no-cache -t webapp:1.0.0 .
+$ docker build --no-cache -t restadapter:1.0.0 .
 </pre>
 
 ### (3) Clone local-network repo
@@ -64,21 +64,14 @@ GSMA_COUCHDB_USER=nomad
 GSMA_COUCHDB_PASSWORD=Grd5EfTg!dd
 </pre>
 
-### (5) Update ``/etc/hosts``. Replace 192.168.2.119 with your host ip
-
-<pre>
-192.168.2.119  dtag.poc.com.local
-192.168.2.119  tmus.poc.com.local
-</pre>
-
-### (6) Launch network
+### (5) Launch network
 
 <pre>
 $ cd network-local
 $ docker-compose up
 </pre>
 
-### (7) Setup network and webapp
+### (6) Setup network and restadapter
 
 Open new tab in the current terminal
 
@@ -86,16 +79,6 @@ Open new tab in the current terminal
 $ cd network-local
 $ ./nomad.sh setup
 </pre>
-
-### (8) Open webapp
-
-**DTAG**
-
-Url: https://dtag.poc.com.local
-
-**TMUS**
-
-Url: https://tmus.poc.com.local
 
 ## Test offchain communication
 
@@ -121,19 +104,19 @@ $ apk --no-cache add curl
 SetData:
 
 <pre>
-$ curl -v -X POST "http://webapp-dtag:3000/api/v1/offchain/setData/abcd?org=TMUS" -d'{"hello":"world"}'
+$ curl -v -X POST "http://restadapter-dtag:3000/api/v1/offchain/setData/abcd?org=TMUS" -d'{"hello":"world"}'
 </pre>
 
 GetData:
 
 <pre>
-$ curl -v -X GET "http://webapp-dtag:3000/api/v1/offchain/getData/abcd?org=TMUS&val=true"
+$ curl -v -X GET "http://restadapter-dtag:3000/api/v1/offchain/getData/abcd?org=TMUS&val=true"
 </pre>
 
 VerifyRemote:
 
 <pre>
-$ curl -v -X GET "http://webapp-dtag:3000/api/v1/offchain/verifyRemote/abcd?org=TMUS"
+$ curl -v -X GET "http://restadapter-dtag:3000/api/v1/offchain/verifyRemote/abcd?org=TMUS"
 </pre>
 
 ## Create new chaincode package (tar.gz)
@@ -145,5 +128,5 @@ $ ./nomad.sh tty cli-dtag
 $ cd /opt/gopath/src/github.com/chaincode/offchain/1.0.0
 $ GO111MODULE=on go mod vendor
 $ cd /opt/gopath/src/github.com/hyperledger/fabric/peer
-$ peer lifecycle chaincode package cli/offchain-v1.0.0.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-offchain/1.0.0/ --label offchain_v1.1.0
+$ peer lifecycle chaincode package cli/offchain-v1.0.0.tar.gz --path /opt/gopath/src/github.com/chaincode/offchain/1.0.0/ --label offchain_v1.1.0
 </pre>

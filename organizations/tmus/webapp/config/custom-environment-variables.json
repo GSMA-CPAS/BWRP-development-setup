@@ -4,15 +4,5 @@
       "user": "TMUS_MYSQL_USER",
       "password": "TMUS_MYSQL_PASSWORD"
     }
-  },
-  "backendAdapters": {
-    "FabricAdapter": {
-      "config": {
-        "ca": {
-          "adminEnrollmentSecret": "TMUS_CA_ADMIN_ENROLLMENT_SECRET",
-          "userEnrollmentSecret": "TMUS_CA_USER_ENROLLMENT_SECRET"
-        }
-      }
-    }
   }
 }

@@ -4,15 +4,5 @@
       "user": "DTAG_MYSQL_USER",
       "password": "DTAG_MYSQL_PASSWORD"
     }
-  },
-  "backendAdapters": {
-    "FabricAdapter": {
-      "config": {
-        "ca": {
-          "adminEnrollmentSecret": "DTAG_CA_ADMIN_ENROLLMENT_SECRET",
-          "userEnrollmentSecret": "DTAG_CA_USER_ENROLLMENT_SECRET"
-        }
-      }
-    }
   }
 }
