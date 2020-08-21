@@ -95,7 +95,7 @@ func (s *RoamingSmartContract) StoreSignature(ctx contractapi.TransactionContext
 	return StoreData(ctx, key, "SIGNATURE_"+algorithm, signature)
 }
 
-func getRestURI() {
+func getRestURI() string {
 	restURI := os.Getenv("ROAMING_CHAINCODE_REST_URI")
 	if restURI != "" {
 		return restURI
