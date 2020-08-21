@@ -69,6 +69,12 @@ func authenticateCallerCanSign() bool {
 }
 
 // StoreData stores given data with a given type on the ledger
+/*
+StoreDocument(document):
+-	Query function
+-	Forwards document data to configured internal REST API
+-	REST API configured via environment variable?
+*/
 func StoreData(ctx contractapi.TransactionContextInterface, key string, dataType string, data []byte) error {
 	// fetch storage location where we will store the data
 	storageLocation, err := GetStorageLocation(ctx, dataType, key)
@@ -95,11 +101,21 @@ func (s *RoamingSmartContract) StoreSignature(ctx contractapi.TransactionContext
 	return StoreData(ctx, key, "SIGNATURE_"+algorithm, signature)
 }
 
+func getRestURI() {
+	restURI := os.Getenv("ROAMING_CHAINCODE_REST_URI")
+	if restURI != "" {
+		return restURI
+	}
+
+	// default for uninitialized env vars
+	return "http://localhost:3333"
+}
+
 // StorePayload will store the given payload in the local db via a ReST call
 func StorePayload(partnerMSP string, data string) error {
 	// send data via a REST request to the DB
 	// todo: use a special hostname (e.g. rest_service.local) instead of localhost
-	url := "http://localhost:3333/write/" + partnerMSP + "/0"
+	url := getRestURI() + "/write/" + partnerMSP + "/0"
 	log.Infof("will send post request to %s", url)
 
 	response, err := http.Post(url, "application/json", strings.NewReader(data))
