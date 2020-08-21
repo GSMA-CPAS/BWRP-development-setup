@@ -43,7 +43,7 @@ type RoamingSmartContract struct {
 // a given storageType and key by using the composite key feature
 func GetStorageLocation(ctx contractapi.TransactionContextInterface, storageType string, key string) (string, error) {
 	// fetch calling MSP
-	callerID, err := GetCallerMSPID(ctx)
+	callerID, err := getCallerMSPID(ctx)
 	if err != nil {
 		log.Errorf("failed to fetch callerid: %s", err.Error())
 		return "", err
@@ -69,12 +69,6 @@ func authenticateCallerCanSign() bool {
 }
 
 // StoreData stores given data with a given type on the ledger
-/*
-StoreDocument(document):
--	Query function
--	Forwards document data to configured internal REST API
--	REST API configured via environment variable?
-*/
 func StoreData(ctx contractapi.TransactionContextInterface, key string, dataType string, data []byte) error {
 	// fetch storage location where we will store the data
 	storageLocation, err := GetStorageLocation(ctx, dataType, key)
@@ -111,11 +105,33 @@ func getRestURI() {
 	return "http://localhost:3333"
 }
 
-// StorePayload will store the given payload in the local db via a ReST call
-func StorePayload(partnerMSP string, data string) error {
+// GetCallerMSPID returns the caller MSPID
+func getCallerMSPID(ctx contractapi.TransactionContextInterface) (string, error) {
+	// fetch callers MSP name
+	msp, err := cid.GetMSPID(ctx.GetStub())
+	if err != nil {
+		log.Errorf("failed to get caller MSPID: %s", err.Error())
+		return "", err
+	}
+
+	log.Infof("got caller MSPID '%s'", msp)
+	return msp, nil
+}
+
+// StoreDocument will store contract Data locally
+// this can be called on a remote peer or locally
+func (s *RoamingSmartContract) StoreDocument(ctx contractapi.TransactionContextInterface, targetMSPID string, data string) error {
+	// get the caller MSPID
+	callerMSPID, err := getCallerMSPID(ctx)
+	if err != nil {
+		log.Errorf("failed to fetch MSPID: %s", err.Error())
+		return err
+	}
+	log.Infof("got MSP IDs: caller = %s, partner = %s", callerMSPID, targetMSPID)
+
 	// send data via a REST request to the DB
 	// todo: use a special hostname (e.g. rest_service.local) instead of localhost
-	url := getRestURI() + "/write/" + partnerMSP + "/0"
+	url := getRestURI() + "/write/" + callerMSPID + "/" + targetMSPID + "/0"
 	log.Infof("will send post request to %s", url)
 
 	response, err := http.Post(url, "application/json", strings.NewReader(data))
@@ -136,48 +152,6 @@ func StorePayload(partnerMSP string, data string) error {
 	log.Infof("got response body %s", string(body))
 
 	return nil
-}
-
-// GetCallerMSPID returns the caller MSPID
-func GetCallerMSPID(ctx contractapi.TransactionContextInterface) (string, error) {
-	// fetch callers MSP name
-	msp, err := cid.GetMSPID(ctx.GetStub())
-	if err != nil {
-		log.Errorf("failed to get caller MSPID: %s", err.Error())
-		return "", err
-	}
-
-	log.Infof("got caller MSPID '%s'", msp)
-	return msp, nil
-}
-
-// StorePrivateData will store contract Data locally
-// this can be called on a remote peer or locally.
-// it will store the private data on the called peer
-func (s *RoamingSmartContract) StorePrivateData(ctx contractapi.TransactionContextInterface, partnerMSPID string, data string) error {
-	// fetch local MSPID
-	localMSPID := os.Getenv("CORE_PEER_LOCALMSPID")
-
-	// get the caller MSPID
-	callerMSPID, err := GetCallerMSPID(ctx)
-	if err != nil {
-		log.Errorf("failed to fetch MSPID: %s", err.Error())
-		return err
-	}
-
-	log.Infof("got MSP IDs: local = %s, caller = %s, partner = %s", localMSPID, callerMSPID, partnerMSPID)
-
-	// make sure this is called on the proper peers
-	if localMSPID == partnerMSPID {
-		log.Info("store private data: remote call")
-		return StorePayload(callerMSPID, data)
-	} else if localMSPID == callerMSPID {
-		log.Info("store private data: local call")
-		return StorePayload(partnerMSPID, data)
-	}
-
-	log.Errorf("invalid call, partnerMSPID does neither match local nor caller MSPID")
-	return fmt.Errorf("invalid call for given partnerMSPID")
 }
 
 // safe to store the data:
