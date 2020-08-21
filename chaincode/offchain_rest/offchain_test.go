@@ -92,6 +92,8 @@ func TestGetAllSignatures(t *testing.T) {
 	dumpAllPartialStates(t, shimStub, "owner~type~key")
 
 	signatures, err := GetSignatures(transactionContext, "org1MSP", key1)
+	//TODO: mock setup returns "not implemented" for GetHistoryForKey
+	// https://jira.hyperledger.org/browse/FAB-5507
 	require.NoError(t, err)
 
 	for i, val := range signatures {
@@ -118,7 +120,7 @@ func TestStoreSignature(t *testing.T) {
 
 	// test storesignature
 	key := "0x01234KEY"
-	err = contract.StoreSignature(transactionContext, key, "SHA3", []byte("\x1234"))
+	err = contract.StoreSignature(transactionContext, key, "\x1234")
 	require.NoError(t, err)
 
 	// execute tx

@@ -58,7 +58,12 @@ func GetSignatures(ctx contractapi.TransactionContextInterface, targetMSPID stri
 		return nil, err
 	}
 
+	log.Infof("getting history for key %s", storageLocation)
 	iterator, err := ctx.GetStub().GetHistoryForKey(storageLocation)
+	if err != nil {
+		log.Infof("failed to get history: %s", err.Error())
+		return nil, err
+	}
 	if iterator == nil {
 		log.Infof("no results found")
 		return nil, fmt.Errorf("GetHistoryForKey found no results")
