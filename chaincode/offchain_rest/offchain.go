@@ -77,7 +77,7 @@ func StoreData(ctx contractapi.TransactionContextInterface, key string, dataType
 		return err
 	}
 
-	// IDEA/CHECK with martin:
+	// TODO: IDEA/CHECK with martin:
 	// instead of manually appending data (i.e. ledger[key] = ledger[key] . {newdata} )
 	// we could just overwrite data and use getHistoryForKey(key) to retrieve all values?
 	// NOTE: this method requires peer configuration core.ledger.history.enableHistoryDatabase to be true!
@@ -117,6 +117,14 @@ func getCallerMSPID(ctx contractapi.TransactionContextInterface) (string, error)
 	log.Infof("got caller MSPID '%s'", msp)
 	return msp, nil
 }
+
+/*
+CreateSignature(document):
+-	Query function
+-	Creates signature over data using globally defined signature algorithm with caller’s HLF key
+-	Returns signature, signature_algorithm
+crypto/ed25519 - Golang
+*/
 
 // StoreDocument will store contract Data locally
 // this can be called on a remote peer or locally
