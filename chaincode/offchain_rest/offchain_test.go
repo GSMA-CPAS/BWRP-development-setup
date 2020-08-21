@@ -4,7 +4,6 @@ package offchain
 
 import (
 	"encoding/hex"
-	"fmt"
 	"testing"
 
 	"chaincode/offchain_rest/mocks"
@@ -56,72 +55,35 @@ func setCreator(t *testing.T, stub *shimtest.MockStub, mspID string, idbytes []b
 	stub.Creator = b
 }
 
-/*func TestPutData(t *testing.T) {
-	chaincodeStub := &mocks.ChaincodeStub{}
-	setCreator(t, chaincodeStub, "org1MSP", []byte(cert))
-	clientID, err := cid.New(chaincodeStub)
-	require.NoError(t, err)
-	transactionContext := &mocks.TransactionContext{}
-	transactionContext.GetStubReturns(chaincodeStub)
-	transactionContext.GetClientIdentityReturns(clientID)
-	contract := RoamingSmartContract{}
-
-	mspid, err := clientID.GetMSPID()
-	require.NoError(t, err)
-	os.Setenv("CORE_PEER_LOCALMSPID", mspid)
-	//response, err := contract.SetSQLDBConn(transactionContext, "192.168.0.40", "3306", "nomad", "nomad", "private_db")
-
-	// local store operation
-	err = contract.StorePrivateData(transactionContext, "org2MSP", "data")
-	require.NoError(t, err)
-
-	// remote store operation
-	os.Setenv("CORE_PEER_LOCALMSPID", "org2MSP")
-	err = contract.StorePrivateData(transactionContext, "org2MSP", "data")
-	require.NoError(t, err)
-
-	// dangerous, wrong store operation on invalid peer
-	os.Setenv("CORE_PEER_LOCALMSPID", "org3MSP")
-	err = contract.StorePrivateData(transactionContext, "org2MSP", "data")
-	require.Error(t, err)
-
-	//require.Equal(t, "OK", response.Status, "Status unexpected")
-}*/
-
 func TestStoreSignature(t *testing.T) {
+	contract := RoamingSmartContract{}
 	shimStub := shimtest.NewMockStub("Test", nil)
-
-	//clientID, err := cid.New(mockStub)
-	//require.NoError(t, err)
-	//transactionContext := &mocks.TransactionContext{}
-
-	// test put and get state:
-	shimStub.MockTransactionStart("init")
-	shimStub.PutState("test", []byte("test"))
-	shimStub.MockTransactionEnd("init")
-
-	res, err := shimStub.GetState("test")
-	require.NoError(t, err)
-	if err != nil {
-		log.Errorf("ERROR")
-	}
-	log.Infof("READ [%q]\n", hex.EncodeToString(res))
 
 	setCreator(t, shimStub, "org1MSP", []byte(cert))
 
-	_, err = cid.New(shimStub)
-	require.NoError(t, err)
-
-	/*chaincodeStub := &mocks.ChaincodeStub{}
-	setCreator(t, chaincodeStub, "org1MSP", []byte(cert))
-
-	clientID, err := cid.New(chaincodeStub)
+	clientID, err := cid.New(shimStub)
 	require.NoError(t, err)
 	transactionContext := &mocks.TransactionContext{}
 
-	// tell the mock setup what to return
-	transactionContext.GetStubReturns(mockStub)
+	transactionContext.GetStubReturns(shimStub)
 	transactionContext.GetClientIdentityReturns(clientID)
+
+	// start tx
+	shimStub.MockTransactionStart("txid_dummy_init")
+
+	// test storesignature
+	key := "0x01234KEY"
+	err = contract.StoreSignature(transactionContext, key, "SHA3", []byte("\x1234"))
+	require.NoError(t, err)
+
+	// execute tx
+	shimStub.MockTransactionEnd("txid_dummy_init")
+
+	dumpAllPartialStates(t, shimStub, "owner~type~key")
+
+	/*chaincodeStub := &mocks.ChaincodeStub{}
+
+	// tell the mock setup what to return
 
 	// tell the mock which functions to use
 	chaincodeStub.CreateCompositeKeyCalls(shim.CreateCompositeKey)
@@ -155,13 +117,36 @@ func TestStoreSignature(t *testing.T) {
 	*/
 }
 
-func dumpAllStates(t *testing.T, stub *mocks.ChaincodeStub) {
-	keysIter, err := stub.GetStateByRange("\x00", "z")
+func TestPutAndGetState(t *testing.T) {
+	shimStub := shimtest.NewMockStub("Test", nil)
+
+	testData := []byte("test")
+
+	// test put and get state:
+	shimStub.MockTransactionStart("txid_dummy_init")
+	shimStub.PutState("test", testData)
+	shimStub.MockTransactionEnd("txid_dummy_init")
+
+	res, err := shimStub.GetState("test")
+	require.NoError(t, err)
+	if err != nil {
+		log.Errorf("ERROR")
+	}
+	log.Infof("READ [%s]\n", hex.EncodeToString(res))
+	require.Equal(t, res, testData, "data mismatch")
+
+	dumpAllStates(t, shimStub)
+}
+
+func dumpAllPartialStates(t *testing.T, stub *shimtest.MockStub, keydef string) {
+	keysIter, err := stub.GetStateByPartialCompositeKey(keydef, []string{})
 	require.NoError(t, err)
 	if keysIter == nil {
-		fmt.Printf("> no results found")
+		log.Infof("no results found")
 		return
 	}
+
+	log.Infof("================= dumping ledger for partial key [%s.*]", keydef)
 
 	defer keysIter.Close()
 
@@ -169,28 +154,34 @@ func dumpAllStates(t *testing.T, stub *mocks.ChaincodeStub) {
 		resp, iterErr := keysIter.Next()
 		require.NoError(t, iterErr)
 		require.NotNil(t, resp)
-		fmt.Printf("ledger[%s] = %s\n", resp.Key, resp.Value)
+		log.Infof("                  ledger[%s] = %s\n", resp.Key, resp.Value)
 	}
+	log.Infof("================= done")
 }
 
-func dumpCompositeKey(t *testing.T, stub *mocks.ChaincodeStub, compositeKey string) {
-	fmt.Printf("> dumping composite key '%s'\n", compositeKey)
-
-	myIterator, err := stub.GetStateByPartialCompositeKey(compositeKey, []string{"org1MSP"})
+func dumpAllStates(t *testing.T, stub *shimtest.MockStub) {
+	keysIter, err := stub.GetStateByRange("", "")
 	require.NoError(t, err)
-	require.NotNil(t, myIterator)
-	defer myIterator.Close()
-
-	for myIterator.HasNext() {
-		resp, err := myIterator.Next()
-		require.NoError(t, err)
-
-		fmt.Printf("ledger[%s] = %s\n", resp.Key, resp.Value)
+	if keysIter == nil {
+		log.Infof("no results found")
+		return
 	}
+
+	log.Infof("================= dumping ledger")
+
+	defer keysIter.Close()
+
+	for keysIter.HasNext() {
+		resp, iterErr := keysIter.Next()
+		require.NoError(t, iterErr)
+		require.NotNil(t, resp)
+		log.Infof("                  ledger[%s] = %s\n", resp.Key, resp.Value)
+	}
+	log.Infof("================= done")
 }
 
 // based on ideas from https://medium.com/coinmonks/tutorial-on-hyperledger-fabrics-chaincode-testing-44c3f260cb2b
-func checkState(t *testing.T, stub *mocks.ChaincodeStub, name string, value string) {
+func checkState(t *testing.T, stub *shimtest.MockStub, name string, value string) {
 	bytes, err := stub.GetState(name)
 	require.NoError(t, err)
 	require.NotNil(t, bytes)
