@@ -96,15 +96,14 @@ func GetStorageLocation(ctx contractapi.TransactionContextInterface, storageType
 	}
 
 	// construct the storage location
-	indexName := "owner~type~key"
-	storageLocation, err := ctx.GetStub().CreateCompositeKey(indexName, []string{callerID, storageType, key})
+	storageLocation, err := ctx.GetStub().CreateCompositeKey(compositeKeyDefinition, []string{callerID, storageType, key})
 
 	if err != nil {
 		log.Errorf("failed to create composite key: %s", err.Error())
 		return "", err
 	}
 
-	log.Infof("got composite key for <%s> = 0x%s", indexName, hex.EncodeToString([]byte(storageLocation)))
+	log.Infof("got composite key for <%s> = 0x%s", compositeKeyDefinition, hex.EncodeToString([]byte(storageLocation)))
 
 	return storageLocation, nil
 }
