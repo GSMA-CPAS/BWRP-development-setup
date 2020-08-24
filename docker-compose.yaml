@@ -171,9 +171,9 @@ services:
     networks:
       - nomad
 
-  webapp-dtag:
-    container_name: webapp-dtag
-    image: webapp:${WEBAPP_VERSION}
+  restadapter-dtag:
+    container_name: restadapter-dtag
+    image: restadapter:${REST_ADAPTER_VERSION}
     restart: always
     environment:
       DTAG_MYSQL_USER: ${DTAG_MYSQL_USER}
@@ -184,6 +184,7 @@ services:
       - ./organizations/dtag/webapp/certs:/app/certs
       - ./organizations/dtag/webapp/config/custom-environment-variables.json:/app/config/custom-environment-variables.json
       - ./organizations/dtag/webapp/config/production.json:/app/config/production.json
+      - ./organizations/dtag/webapp/offchain/connection.json:/app/offchain/connection.json
     ports:
       - 3010:3000
     depends_on:
@@ -324,9 +325,9 @@ services:
     networks:
       - nomad
 
-  webapp-tmus:
-    container_name: webapp-tmus
-    image: webapp:${WEBAPP_VERSION}
+  restadapter-tmus:
+    container_name: restadapter-tmus
+    image: restadapter:${REST_ADAPTER_VERSION}
     restart: always
     environment:
       TMUS_MYSQL_USER: ${TMUS_MYSQL_USER}
@@ -337,6 +338,7 @@ services:
       - ./organizations/tmus/webapp/certs:/app/certs
       - ./organizations/tmus/webapp/config/custom-environment-variables.json:/app/config/custom-environment-variables.json
       - ./organizations/tmus/webapp/config/production.json:/app/config/production.json
+      - ./organizations/tmus/webapp/offchain/connection.json:/app/offchain/connection.json
     ports:
       - 3020:3000
     depends_on:

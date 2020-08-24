@@ -15,7 +15,9 @@ function invoke {
 }
 
 function query {
-  queryChaincode $1 $2 9051 '["getOrganization"]'
+  #queryChaincode $1 $2 9051 '["getOrganization"]'
+  queryChaincode $1 $2 9051 '["SetSQLDBConn","db-tmus","3306","nomad","Fe3gtZ6!s4Fe","tmus"]'
+  #queryChaincode $1 $2 9051 '["Test"]'
 }
 
 function package_chaincode {

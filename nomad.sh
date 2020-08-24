@@ -17,12 +17,12 @@ function printHelp() {
 }
 
 function setup_dtag() {
-  docker exec -ti --user root webapp-dtag node setup.js
+  docker exec -ti --user root restadapter-dtag node setup.js
   docker exec -ti cli-dtag cli/script.sh setup
 }
 
 function setup_tmus() {
-  docker exec -ti --user root webapp-tmus node setup.js
+  docker exec -ti --user root restadapter-tmus node setup.js
   docker exec -ti cli-tmus cli/script.sh setup
 }
 

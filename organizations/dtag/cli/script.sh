@@ -16,8 +16,10 @@ function invoke {
 }
 
 function query {
-  queryChaincode $1 $2 7051 '["getOrganization"]'
+  #queryChaincode $1 $2 7051 '["getOrganization"]'
   #queryChaincode $1 $2 7051 '["getSignatures","24"]'
+  queryChaincode $1 $2 7051 '["SetSQLDBConn","db-dtag","3306","nomad","Fe3gtZ6!s4Fe","dtag"]'
+  #queryChaincode $1 $2 7051 '["Test"]'
 }
 
 function package_chaincode {

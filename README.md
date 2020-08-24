@@ -1,4 +1,4 @@
-# Local Network
+# Local Network (offchain prototype)
 
 ## Requirements
 
@@ -7,25 +7,25 @@
 
 ## Installation
 
-### (1) Clone webapp repo
+### (1) Clone restadapter repo
 
 <pre>
 $ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/webapp.git
+$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/restadapter.git
 </pre>
 
-### (2) Build webapp docker image
+### (2) Build restadapter docker image
 
 <pre>
 $ cd nomad/webapp
-$ docker build --no-cache -t webapp:1.0.0 .
+$ docker build --no-cache -t restadapter:1.0.0 .
 </pre>
 
 ### (3) Clone local-network repo
 
 <pre>
 $ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/network-local.git
+$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/network-local.git -b offchain_prototype
 </pre>
 
 ### (4) Create ``.env`` file in network-local (example .env-template)
@@ -64,21 +64,14 @@ GSMA_COUCHDB_USER=nomad
 GSMA_COUCHDB_PASSWORD=Grd5EfTg!dd
 </pre>
 
-### (5) Update ``/etc/hosts``. Replace 192.168.2.119 with your host ip
-
-<pre>
-192.168.2.119  dtag.poc.com.local
-192.168.2.119  tmus.poc.com.local
-</pre>
-
-### (6) Launch network
+### (5) Launch network
 
 <pre>
 $ cd network-local
 $ docker-compose up
 </pre>
 
-### (7) Setup network and webapp
+### (6) Setup network and restadapter
 
 Open new tab in the current terminal
 
@@ -87,15 +80,44 @@ $ cd network-local
 $ ./nomad.sh setup
 </pre>
 
-### (8) Open webapp
+## Test offchain communication
 
-**DTAG**
+Query SetSQLDBConn to configure the chaincode to read/write to mysql database.
 
-Url: https://dtag.poc.com.local
+<pre>
+$ ./nomad.sh query dtag peer0
+$ ./nomad.sh query tmus peer0
+</pre>
 
-**TMUS**
+Enter CLI container of organization DTAG:
 
-Url: https://tmus.poc.com.local
+<pre>
+$ ./nomad.sh tty cli-dtag
+</pre>
+
+Install curl:
+
+<pre>
+$ apk --no-cache add curl
+</pre>
+
+SetData:
+
+<pre>
+$ curl -v -X POST "http://restadapter-dtag:3000/api/v1/offchain/setData/abcd?org=TMUS" -d'{"hello":"world"}'
+</pre>
+
+GetData:
+
+<pre>
+$ curl -v -X GET "http://restadapter-dtag:3000/api/v1/offchain/getData/abcd?org=TMUS&val=true"
+</pre>
+
+VerifyRemote:
+
+<pre>
+$ curl -v -X GET "http://restadapter-dtag:3000/api/v1/offchain/verifyRemote/abcd?org=TMUS"
+</pre>
 
 ## Create new chaincode package (tar.gz)
 
@@ -103,8 +125,8 @@ Example: create new chaincode package (v1.1.0) for organization DTAG. It will be
 
 <pre>
 $ ./nomad.sh tty cli-dtag
-$ cd /opt/gopath/src/github.com/chaincode/cc-documents/1.0.0
+$ cd /opt/gopath/src/github.com/chaincode/offchain/1.0.0
 $ GO111MODULE=on go mod vendor
 $ cd /opt/gopath/src/github.com/hyperledger/fabric/peer
-$ peer lifecycle chaincode package cli/documents-v1.1.0.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-documents/1.0.0/ --label documents_v1.1.0
+$ peer lifecycle chaincode package cli/offchain-v1.0.0.tar.gz --path /opt/gopath/src/github.com/chaincode/offchain/1.0.0/ --label offchain_v1.1.0
 </pre>
