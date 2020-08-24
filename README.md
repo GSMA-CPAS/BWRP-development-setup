@@ -1,4 +1,4 @@
-# Local Network (offchain prototype)
+# Local Network
 
 ## Requirements
 
@@ -17,7 +17,7 @@ $ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/restadapter.gi
 ### (2) Build restadapter docker image
 
 <pre>
-$ cd nomad/webapp
+$ cd nomad/restadapter
 $ docker build --no-cache -t restadapter:1.0.0 .
 </pre>
 
@@ -25,7 +25,7 @@ $ docker build --no-cache -t restadapter:1.0.0 .
 
 <pre>
 $ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/network-local.git -b offchain_prototype
+$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/network-local.git
 </pre>
 
 ### (4) Create ``.env`` file in network-local (example .env-template)
