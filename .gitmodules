@@ -4,3 +4,6 @@
 [submodule "chaincode"]
 	path = chaincode
 	url = https://git.trilobyte-se.de/git/nomad/nomad-gsma-atomic/chaincode.git
+[submodule "restadapter"]
+	path = restadapter
+	url = https://git.trilobyte-se.de/git/nomad/nomad-gsma-atomic/restadapter.git
