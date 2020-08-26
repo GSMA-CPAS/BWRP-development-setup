@@ -87,14 +87,16 @@ services:
     image: offchain-db-adapter
     restart: always
     environment:
-      - ODBA_MYSQL_SERVER_HOST=localhost
-      - ODBA_MYSQL_SERVER_PORT=3316
+      - ODBA_MYSQL_SERVER_HOST=offchain-db-dtag
+      - ODBA_MYSQL_SERVER_PORT=3306
       - ODBA_MYSQL_USER=${DTAG_OFFCHAIN_MYSQL_USER}
       - ODBA_MYSQL_PASSWORD=${DTAG_OFFCHAIN_MYSQL_PASSWORD}
       - ODBA_MYSQL_DATABASE=${DTAG_OFFCHAIN_MYSQL_DB}
       - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}      
     ports:
       - ${DTAG_OFFCHAIN_REST_PORT}:${DTAG_OFFCHAIN_REST_PORT}
+    depends_on:
+      - offchain-db-dtag
     networks:
       - nomad
 
@@ -108,7 +110,7 @@ services:
       MYSQL_USER: ${DTAG_OFFCHAIN_MYSQL_USER}
       MYSQL_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_PASSWORD}
     ports:
-      - 3316:3306
+      - 3326:3306
     networks:
       - nomad
 
@@ -267,20 +269,22 @@ services:
   #
   # ===================================================================
 
-  offchain-db-adapte0-tmusr:
+  offchain-db-adapter-tmus:
     build: ./offchain_db_adapter
     container_name: offchain-db-adapter-tmus
     image: offchain-db-adapter
     restart: always
     environment:
-      - ODBA_MYSQL_SERVER_HOST=localhost
-      - ODBA_MYSQL_SERVER_PORT=3317
+      - ODBA_MYSQL_SERVER_HOST=offchain-db-tmus
+      - ODBA_MYSQL_SERVER_PORT=3306
       - ODBA_MYSQL_USER=${TMUS_OFFCHAIN_MYSQL_USER}
       - ODBA_MYSQL_PASSWORD=${TMUS_OFFCHAIN_MYSQL_PASSWORD}
       - ODBA_MYSQL_DATABASE=${TMUS_OFFCHAIN_MYSQL_DB}
       - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}      
     ports:
       - ${TMUS_OFFCHAIN_REST_PORT}:${TMUS_OFFCHAIN_REST_PORT}
+    depends_on:
+      - offchain-db-tmus 
     networks:
       - nomad
 
@@ -294,7 +298,7 @@ services:
       MYSQL_USER: ${TMUS_OFFCHAIN_MYSQL_USER}
       MYSQL_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_PASSWORD}
     ports:
-      - 3317:3306 
+      - 3316:3306
     networks:
       - nomad
 
