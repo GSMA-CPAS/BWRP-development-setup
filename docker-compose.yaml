@@ -81,6 +81,37 @@ services:
   #
   # ===================================================================
 
+  offchain-db-adapter-dtag:
+    build: ./offchain-db-adapter
+    container_name: offchain-db-adapter-dtag
+    image: offchain-db-adapter
+    restart: always
+    environment:
+      - ODBA_MYSQL_SERVER_HOST=localhost
+      - ODBA_MYSQL_SERVER_PORT=3306
+      - ODBA_MYSQL_USER=${DTAG_OFFCHAIN_MYSQL_USER}
+      - ODBA_MYSQL_PASSWORD=${DTAG_OFFCHAIN_MYSQL_PASSWORD}
+      - ODBA_MYSQL_DATABASE=${DTAG_OFFCHAIN_MYSQL_DB}
+      - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}      
+    ports:
+      - ${DTAG_OFFCHAIN_REST_PORT}:${DTAG_OFFCHAIN_REST_PORT}
+    networks:
+      - nomad
+
+  offchain-db-dtag:
+    container_name: offchain-db-dtag
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: {DTAG_OFFCHAIN_MYSQL_DB}
+      MYSQL_USER: ${DTAG_OFFCHAIN_MYSQL_USER}
+      MYSQL_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_PASSWORD}
+    ports:
+      - 3306:3306
+    networks:
+      - nomad
+
   ca-dtag:
     container_name: ca-dtag
     image: hyperledger/fabric-ca:${HLF_CA_VERSION}
@@ -235,6 +266,37 @@ services:
   # TMUS
   #
   # ===================================================================
+
+  offchain-db-adapte0-tmusr:
+    build: ./offchain-db-adapter
+    container_name: offchain-db-adapter-tmus
+    image: offchain-db-adapter
+    restart: always
+    environment:
+      - ODBA_MYSQL_SERVER_HOST=localhost
+      - ODBA_MYSQL_SERVER_PORT=3306
+      - ODBA_MYSQL_USER=${TMUS_OFFCHAIN_MYSQL_USER}
+      - ODBA_MYSQL_PASSWORD=$TMUS_OFFCHAIN_MYSQL_PASSWORD}
+      - ODBA_MYSQL_DATABASE=${TMUS_OFFCHAIN_MYSQL_DB}
+      - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}      
+    ports:
+      - ${TMUS_OFFCHAIN_REST_PORT}:${TMUS_OFFCHAIN_REST_PORT}
+    networks:
+      - nomad
+
+  offchain-db-tmus:
+    container_name: offchain-db-tmus
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: {TMUS_OFFCHAIN_MYSQL_DB}
+      MYSQL_USER: ${TMUS_OFFCHAIN_MYSQL_USER}
+      MYSQL_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_PASSWORD}
+    ports:
+      - 3306:3306
+    networks:
+      - nomad
 
   ca-tmus:
     container_name: ca-tmus
