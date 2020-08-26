@@ -7,25 +7,11 @@
 
 ## Installation
 
-### (1) Clone restadapter repo
+### (1) Clone git submodules
 
 <pre>
-$ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/restadapter.git
-</pre>
-
-### (2) Build restadapter docker image
-
-<pre>
-$ cd nomad/restadapter
-$ docker build --no-cache -t restadapter:1.0.0 .
-</pre>
-
-### (3) Clone local-network repo
-
-<pre>
-$ cd nomad
-$ git clone ssh://git@git.trilobyte-se.de/nomad/nomad-gsma-atomic/network-local.git
+$ cd network-local
+$ git submodule update --init
 </pre>
 
 ### (4) Create ``.env`` file in network-local (example .env-template)
