@@ -1,0 +1,3 @@
+[submodule "offchain_db_adapter"]
+	path = offchain_db_adapter
+	url = https://git.trilobyte-se.de/git/nomad/nomad-gsma-atomic/offchain_db_adapter.git
