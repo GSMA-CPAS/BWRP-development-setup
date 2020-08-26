@@ -172,6 +172,7 @@ services:
       - nomad
 
   restadapter-dtag:
+    build: ./restadapter
     container_name: restadapter-dtag
     image: restadapter:${REST_ADAPTER_VERSION}
     restart: always
@@ -326,6 +327,7 @@ services:
       - nomad
 
   restadapter-tmus:
+    build: ./restadapter
     container_name: restadapter-tmus
     image: restadapter:${REST_ADAPTER_VERSION}
     restart: always
