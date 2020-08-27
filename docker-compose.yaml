@@ -140,13 +140,13 @@ services:
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_nomad
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=peer0.dtag.nomad.com
-      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:7051
-      - CORE_PEER_LISTENADDRESS=peer0.dtag.nomad.com:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.dtag.nomad.com:7052
-      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.dtag.nomad.com:7052
+      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
+      - CORE_PEER_LISTENADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
+      - CORE_PEER_CHAINCODEADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_CHAINCODE_PORT}
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_CHAINCODE_PORT}
       - CORE_PEER_LOCALMSPID=DTAG
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.dtag.nomad.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.dtag.nomad.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_PROFILE_ENABLED=true
@@ -171,8 +171,7 @@ services:
       - ./crypto-config/peerOrganizations/dtag.nomad.com/users:/etc/hyperledger/fabric/users
       - peer0.dtag.nomad.com:/var/hyperledger/production
     ports:
-      - 7051:7051
-      - 7053:7053
+      - ${DTAG_PEER_PORT}:${DTAG_PEER_PORT}
     depends_on:
       - couchdb-peer0-dtag
     networks:
@@ -239,7 +238,7 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli-dtag
-      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:7051
+      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
       - CORE_PEER_LOCALMSPID=DTAG
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dtag.nomad.com/users/Admin@dtag.nomad.com/msp
       - CORE_PEER_TLS_ENABLED=true
@@ -328,13 +327,13 @@ services:
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_nomad
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=peer0.tmus.nomad.com
-      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:9051
-      - CORE_PEER_LISTENADDRESS=peer0.tmus.nomad.com:9051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.tmus.nomad.com:9052
-      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.tmus.nomad.com:9052
+      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
+      - CORE_PEER_LISTENADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
+      - CORE_PEER_CHAINCODEADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_CHAINCODE_PORT}
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_CHAINCODE_PORT}
       - CORE_PEER_LOCALMSPID=TMUS
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.tmus.nomad.com:9051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.tmus.nomad.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_PROFILE_ENABLED=true
@@ -359,8 +358,7 @@ services:
       - ./crypto-config/peerOrganizations/tmus.nomad.com/users:/etc/hyperledger/fabric/users
       - peer0.tmus.nomad.com:/var/hyperledger/production
     ports:
-      - 9051:9051
-      - 9053:9053
+      - ${TMUS_PEER_PORT}:${TMUS_PEER_PORT}
     depends_on:
       - couchdb-peer0-tmus
     networks:
@@ -427,7 +425,7 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli-tmus
-      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:9051
+      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
       - CORE_PEER_LOCALMSPID=TMUS
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/tmus.nomad.com/users/Admin@tmus.nomad.com/msp
       - CORE_PEER_TLS_ENABLED=true
@@ -466,13 +464,13 @@ services:
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_nomad
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=peer0.gsma.nomad.com
-      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:10051
-      - CORE_PEER_LISTENADDRESS=peer0.gsma.nomad.com:10051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.gsma.nomad.com:10052
-      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.gsma.nomad.com:10052
+      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
+      - CORE_PEER_LISTENADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
+      - CORE_PEER_CHAINCODEADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_CHAINCODE_PORT}
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_CHAINCODE_PORT}
       - CORE_PEER_LOCALMSPID=GSMA
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.gsma.nomad.com:10051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.gsma.nomad.com:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_PROFILE_ENABLED=true
@@ -497,8 +495,7 @@ services:
       - ./crypto-config/peerOrganizations/gsma.nomad.com/users:/etc/hyperledger/fabric/users
       - peer0.gsma.nomad.com:/var/hyperledger/production
     ports:
-      - 10051:10051
-      - 10053:10053
+      - ${GSMA_PEER_PORT}:${GSMA_PEER_PORT}
     depends_on:
       - couchdb-peer0-gsma
     networks:
@@ -527,7 +524,7 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli-gsma
-      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:9051
+      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
       - CORE_PEER_LOCALMSPID=GSMA
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/gsma.nomad.com/users/Admin@gsma.nomad.com/msp
       - CORE_PEER_TLS_ENABLED=true
