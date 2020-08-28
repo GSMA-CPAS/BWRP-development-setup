@@ -4,6 +4,7 @@ ORDERER="orderer.nomad.com:7050"
 ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/nomad.com/orderers/orderer.nomad.com/msp/tlscacerts/tlsca.nomad.com-cert.pem
 ORDERER_CLIENT_CERTFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/nomad.com/users/Admin@nomad.com/tls/client.crt
 ORDERER_CLIENT_KEYFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/nomad.com/users/Admin@nomad.com/tls/client.key
+CHANNEL_NAME=roaming-contracts
 
 CHAINCODE_NAME="offchain"
 CHAINCODE_VERSION="1.0.0"
@@ -13,94 +14,61 @@ PEER_CONN_PARMS="--peerAddresses peer0.dtag.nomad.com:7051 --tlsRootCertFiles /o
 
 
 setGlobals() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  CORE_PEER_LOCALMSPID=${ORG^^}
-  CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/users/Admin@${ORG}.nomad.com/msp
-  CORE_PEER_ADDRESS=${PEER}.${ORG}.nomad.com:${PORT}
-  CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/peers/${PEER}.${ORG}.nomad.com/tls/server.crt
-  CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/peers/${PEER}.${ORG}.nomad.com/tls/server.key
-  CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/peers/${PEER}.${ORG}.nomad.com/tls/ca.crt
+  export CORE_PEER_LOCALMSPID=${ORG^^}
+  export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/users/Admin@${ORG}.nomad.com/msp
+  export CORE_PEER_ADDRESS=${PEER}.${ORG}.nomad.com:${PORT}
+  export CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/peers/${PEER}.${ORG}.nomad.com/tls/server.crt
+  export CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/peers/${PEER}.${ORG}.nomad.com/tls/server.key
+  export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/${ORG}.nomad.com/peers/${PEER}.${ORG}.nomad.com/tls/ca.crt
 }
+#always set globals
+setGlobals
 
 createChannel() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  setGlobals $ORG $PEER $PORT
   set -x
-	peer channel create -o $ORDERER -c roaming-contracts -f ./channel-artifacts/channel-roaming-contracts.tx --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+	peer channel create -o $ORDERER -c ${CHANNEL_NAME} -f ./channel-artifacts/channel-${CHANNEL_NAME}.tx --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
 	set +x
 }
 
 fetchChannel() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  setGlobals $ORG $PEER $PORT
   set -x
-	peer channel fetch 0 -o $ORDERER -c roaming-contracts roaming-contracts.block --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+	peer channel fetch 0 -o $ORDERER -c ${CHANNEL_NAME} ${CHANNEL_NAME}.block --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
 	set +x
 }
 
 joinChannel() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  setGlobals $ORG $PEER $PORT
 	set -x
-	peer channel join -b roaming-contracts.block
+	peer channel join -b ${CHANNEL_NAME}.block
   res=$?
 	set +x
 }
 
 # Update channel configuration to define anchor peer
 updateAnchorPeer() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  setGlobals $ORG $PEER $PORT
 	set -x
-	peer channel update -o $ORDERER -c roaming-contracts -f ./channel-artifacts/channel-roaming-contracts-anchor-${ORG}.tx --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+	peer channel update -o $ORDERER -c ${CHANNEL_NAME} -f ./channel-artifacts/channel-${CHANNEL_NAME}-anchor-${ORG}.tx --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
 	set +x
 }
 
 packageChaincode() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  VERSION_FOLDER=$4
-  VERSION=$5
-  setGlobals $ORG $PEER $PORT
   set -x
-  peer lifecycle chaincode package cli/${CHAINCODE_NAME}-v${VERSION}.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-${CHAINCODE_NAME}/${VERSION_FOLDER}/ --label "${CHAINCODE_NAME}_v${VERSION}"
+  peer lifecycle chaincode package cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-${CHAINCODE_NAME}/$ --label "${CHAINCODE_NAME}_v${CHAINCODE_VERSION}"
   res=$?
   set +x
 }
 
 installPackagedChaincode() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  VERSION=$4
-  setGlobals $ORG $PEER $PORT
   set -x
-  peer lifecycle chaincode install cli/${CHAINCODE_NAME}-v${VERSION}.tar.gz
+  peer lifecycle chaincode install cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz
   res=$?
   set +x
 }
 
 approveChaincode() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  VERSION=$4
-  SEQUENZ=$5
-  setGlobals $ORG $PEER $PORT
+  SEQUENCE=$1
   set -x
   peer lifecycle chaincode queryinstalled >&log.txt
   res=$?
@@ -109,74 +77,53 @@ approveChaincode() {
   PACKAGE_ID=$(sed -n "/${CHAINCODE_NAME}_v${VERSION}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
   echo PackageID is ${PACKAGE_ID}
   set -x
-  peer lifecycle chaincode approveformyorg -o $ORDERER -C roaming-contracts -n $CHAINCODE_NAME -v $VERSION --package-id $PACKAGE_ID --sequence $SEQUENZ --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+  peer lifecycle chaincode approveformyorg -o $ORDERER -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -v $CHAINCODE_VERSION --package-id $PACKAGE_ID --sequence $SEQUENCE --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
   set +x
 }
 
 commitChaincode() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  VERSION=$4
-  SEQUENZ=$5
-  setGlobals $ORG $PEER $PORT
+  SEQUENCE=$1
   set -x
-  peer lifecycle chaincode checkcommitreadiness -C roaming-contracts -n $CHAINCODE_NAME -v $VERSION --sequence $SEQUENZ --output json --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+  peer lifecycle chaincode checkcommitreadiness -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -v $CHAINCODE_VERSION --sequence $SEQUENCE --output json --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
   set +x
   echo '-- commit --'
   set -x
-  peer lifecycle chaincode commit -o $ORDERER -C roaming-contracts -n $CHAINCODE_NAME -v $VERSION --sequence $SEQUENZ $PEER_CONN_PARMS --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+  peer lifecycle chaincode commit -o $ORDERER -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -v $CHAINCODE_VERSION --sequence $SEQUENCE $PEER_CONN_PARMS --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
   set +x
 }
 
 queryChaincode() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  FUNC=$4
-  setGlobals $ORG $PEER $PORT
+  FUNC=$1
   set -x
-	peer chaincode query -C roaming-contracts -n $CHAINCODE_NAME -c '{"Args":'${FUNC}'}'
+	peer chaincode query -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -c '{"Args":'${FUNC}'}'
   res=$?
   set +x
 }
 
 invokeChaincode() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  FUNC=$4
-  setGlobals $ORG $PEER $PORT
+  FUNC=$1
   set -x
-  peer chaincode invoke -o $ORDERER -C roaming-contracts -n $CHAINCODE_NAME -c '{"Args":'${FUNC}'}' $PEER_CONN_PARMS --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+  peer chaincode invoke -o $ORDERER -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -c '{"Args":'${FUNC}'}' $PEER_CONN_PARMS --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
   set +x
 }
 
 invokeWithTransientChaincode() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  FUNC=$4
-  TRANSIENT=$5
-  setGlobals $ORG $PEER $PORT
+  FUNC=$1
+  TRANSIENT=$2
   set -x
-  peer chaincode invoke -o $ORDERER -C roaming-contracts -n $CHAINCODE_NAME -c '{"Args":'${FUNC}'}' --transient $TRANSIENT $PEER_CONN_PARMS --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+  peer chaincode invoke -o $ORDERER -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -c '{"Args":'${FUNC}'}' --transient $TRANSIENT $PEER_CONN_PARMS --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
   set +x
 }
 
 channelInfo() {
-  ORG=$1
-  PEER=$2
-  PORT=$3
-  setGlobals $ORG $PEER $PORT
   peer channel list
   peer lifecycle chaincode queryinstalled
-  peer lifecycle chaincode querycommitted -C roaming-contracts --output json
+  peer lifecycle chaincode querycommitted -C ${CHANNEL_NAME} --output json
 }
 
 fetchChannelConfig() {
@@ -222,9 +169,9 @@ createConfigUpdateWithCRL() {
   crl=$(cat $CORE_PEER_MSPCONFIGPATH/crls/crl*.pem | base64 | tr -d '\n')
   cat config.json | jq '.channel_group.groups.Application.groups.'"${ORG}"'.values.MSP.value.config.revocation_list = ["'"${crl}"'"]' > updated_config.json
   #cat config.json | jq '.channel_group.groups.Application.groups.'"${ORG}"'.values.MSP.value.config.revocation_list = []' > updated_config.json
-  createConfigUpdate roaming-contracts config.json updated_config.json output.pb
-  # peer channel update -f output.pb -c roaming-contracts -o $ORDERER --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
-  peer channel update -f output.pb -c roaming-contracts -o $ORDERER --tls --cafile $ORDERER_CA
+  createConfigUpdate ${CHANNEL_NAME} config.json updated_config.json output.pb
+  # peer channel update -f output.pb -c ${CHANNEL_NAME} -o $ORDERER --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
+  peer channel update -f output.pb -c ${CHANNEL_NAME} -o $ORDERER --tls --cafile $ORDERER_CA
 }
 
 signConfig() {
