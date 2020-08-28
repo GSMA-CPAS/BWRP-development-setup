@@ -55,7 +55,7 @@ updateAnchorPeer() {
 
 packageChaincode() {
   set -x
-  peer lifecycle chaincode package cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz --path /opt/gopath/src/github.com/chaincode/${CHAINCODE_NAME}/$ --label "${CHAINCODE_NAME}_v${CHAINCODE_VERSION}"
+  peer lifecycle chaincode package cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz --path /opt/gopath/src/github.com/chaincode/${CHAINCODE_NAME}/ --label "${CHAINCODE_NAME}_v${CHAINCODE_VERSION}"
   res=$?
   set +x
 }
