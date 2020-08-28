@@ -182,6 +182,17 @@ signConfig() {
   set +x
 }
 
+function setup {
+  SEQUENCE=$1
+  fetchChannel
+  joinChannel
+  updateAnchorPeer
+  packageChaincode
+  installPackagedChaincode
+  approveChaincode $SEQUENCE
+  commitChaincode $SEQUENCE
+}
+
 # Check if the function exists (bash specific)
 if declare -f "$1" > /dev/null
 then
