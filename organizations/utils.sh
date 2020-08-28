@@ -6,7 +6,7 @@ ORDERER_CLIENT_CERTFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypt
 ORDERER_CLIENT_KEYFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/nomad.com/users/Admin@nomad.com/tls/client.key
 CHANNEL_NAME=roaming-contracts
 
-CHAINCODE_NAME="offchain"
+CHAINCODE_NAME="hybrid"
 CHAINCODE_VERSION="1.0.0"
 
 #PEER_CONN_PARMS="--peerAddresses peer0.dtag.nomad.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dtag.nomad.com/peers/peer0.dtag.nomad.com/tls/ca.crt"
@@ -55,7 +55,7 @@ updateAnchorPeer() {
 
 packageChaincode() {
   set -x
-  peer lifecycle chaincode package cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz --path /opt/gopath/src/github.com/chaincode/cc-${CHAINCODE_NAME}/$ --label "${CHAINCODE_NAME}_v${CHAINCODE_VERSION}"
+  peer lifecycle chaincode package cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz --path /opt/gopath/src/github.com/chaincode/${CHAINCODE_NAME}/$ --label "${CHAINCODE_NAME}_v${CHAINCODE_VERSION}"
   res=$?
   set +x
 }
