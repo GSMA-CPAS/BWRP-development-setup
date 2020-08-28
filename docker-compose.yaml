@@ -234,6 +234,9 @@ services:
     tty: true
     stdin_open: true
     environment:
+      - ORG=dtag
+      - PORT=${DTAG_PEER_PORT}
+      - PEER=peer0
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
@@ -421,6 +424,9 @@ services:
     tty: true
     stdin_open: true
     environment:
+      - ORG=tmus
+      - PORT=${TMUS_PEER_PORT}
+      - PEER=peer0
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
