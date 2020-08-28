@@ -182,11 +182,14 @@ signConfig() {
   set +x
 }
 
-function setup {
-  SEQUENCE=$1
+function setupChannel {
   fetchChannel
   joinChannel
   updateAnchorPeer
+}
+
+function setupChaincode {
+  SEQUENCE=$1
   packageChaincode
   installPackagedChaincode
   approveChaincode $SEQUENCE
