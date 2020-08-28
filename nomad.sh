@@ -16,6 +16,23 @@ function printHelp() {
   echo
 }
 
+function setupChannel() {
+  echo "setting up channel"
+  docker exec -ti cli-gsma cli/utils.sh createChannel
+  docker exec -ti cli-gsma cli/utils.sh setupChannel
+  docker exec -ti cli-dtag cli/utils.sh setupChannel
+  docker exec -ti cli-tmus cli/utils.sh setupChannel
+}
+
+function setupChaincode() {
+  echo "setting up Chaincodes"
+  docker exec -ti cli-gsma cli/utils.sh setupChaincode 1
+  docker exec -ti cli-dtag cli/utils.sh setupChaincode 1
+  docker exec -ti cli-tmus cli/utils.sh setupChaincode 1
+  docker exec -ti cli-gsma cli/utils.sh commitChaincode 1
+}
+
+
 function setup_dtag() {
   docker exec -ti --user root restadapter-dtag node setup.js
   docker exec -ti cli-dtag cli/script.sh setup
@@ -32,9 +49,8 @@ function setup_gsma() {
 
 function setup() {
   if [ $# -eq 0 ]; then
-    setup_dtag
-    setup_tmus
-    setup_gsma
+    setupChannel
+    setupChaincode
   else
     case $1 in
       dtag)
@@ -148,6 +164,8 @@ elif [ "${MODE}" == "query" ]; then
   query $1 $2
 elif [ "${MODE}" == "tty" ]; then
   tty $1
+elif [ "${MODE}" == "test" ]; then
+  test
 elif [ "${MODE}" == "down" ]; then
   down
 else
