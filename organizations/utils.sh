@@ -193,7 +193,6 @@ function setupChaincode {
   packageChaincode
   installPackagedChaincode
   approveChaincode $SEQUENCE
-  commitChaincode $SEQUENCE
 }
 
 # Check if the function exists (bash specific)
