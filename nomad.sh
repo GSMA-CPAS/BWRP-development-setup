@@ -125,12 +125,13 @@ function tty() {
 }
 
 function down() {
+  filter='hyperledger\|dev-peer\|mysql\|nginx\|restadapter\|offchain'
   #docker stop $(docker ps -a -q)
-  docker stop $(docker ps -a | grep 'hyperledger\|dev-peer\|mysql\|nginx' | awk '{print $1}')
+  docker stop $(docker ps -a | grep $filter | awk '{print $1}')
   #docker kill $(docker ps -q)
-  docker kill $(docker ps -a | grep 'hyperledger\|dev-peer\|mysql\|nginx' | awk '{print $1}')
+  docker kill $(docker ps -a | grep $filter | awk '{print $1}')
   #docker rm $(docker ps -aq)
-  docker rm $(docker ps -a | grep 'hyperledger\|dev-peer\|mysql\|nginx' | awk '{print $1}')
+  docker rm $(docker ps -a | grep $filter | awk '{print $1}')
   #docker rmi $(docker images dev-* -q)
   docker rmi $(docker images dev-peer* -q)
   docker volume prune --force
