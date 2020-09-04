@@ -77,7 +77,7 @@ approveChaincode() {
   res=$?
   set +x
   cat log.txt
-  PACKAGE_ID=$(sed -n "/${CHAINCODE_NAME}_v${VERSION}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
+  PACKAGE_ID=$(sed -n "/${CHAINCODE_NAME}_v${CHAINCODE_VERSION}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
   echo PackageID is ${PACKAGE_ID}
   set -x
   peer lifecycle chaincode approveformyorg -o $ORDERER -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -v $CHAINCODE_VERSION --package-id $PACKAGE_ID --sequence $SEQUENCE --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
