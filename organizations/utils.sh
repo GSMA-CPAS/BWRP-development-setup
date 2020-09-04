@@ -194,9 +194,10 @@ function setupChannel {
 
 function setupChaincode {
   SEQUENCE=$1
-  #packageChaincode
-  installPackagedChaincode
-  approveChaincode $SEQUENCE
+  CHAINCODE_VERSION=${2:-$CHAINCODE_VERSION_DEFAULT}
+  packageChaincode $CHAINCODE_VERSION
+  installPackagedChaincode $CHAINCODE_VERSION
+  approveChaincode $SEQUENCE $CHAINCODE_VERSION
 }
 
 # Check if the function exists (bash specific)

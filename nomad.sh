@@ -24,14 +24,26 @@ function setupChannel() {
   docker exec -ti cli-tmus cli/utils.sh setupChannel
 }
 
-function setupChaincode() {
-  echo "setting up Chaincodes"
+function setupChaincodes() {
+  echo "setting up chaincodes"
   docker exec -ti cli-gsma cli/utils.sh setupChaincode 1
   docker exec -ti cli-dtag cli/utils.sh setupChaincode 1
   docker exec -ti cli-tmus cli/utils.sh setupChaincode 1
   docker exec -ti cli-gsma cli/utils.sh commitChaincode 1
 }
 
+function upgradeChaincodes() {
+  echo "upgrade chaincodes"
+  CURRENT_VERSION=$(docker exec -ti cli-gsma peer lifecycle chaincode querycommitted -C roaming-contracts | tail -n1 | cut -f4 -d" " | cut -d"," -f1)
+  CURRENT_SEQUENCE=$(docker exec -ti cli-gsma peer lifecycle chaincode querycommitted -C roaming-contracts | tail -n1 | cut -f6 -d" " | cut -d"," -f1)
+  NEW_VERSION=$(echo ${CURRENT_VERSION} | awk -F. -v OFS=. '{$NF++;print}')
+  NEW_SEQUENCE=$(echo ${CURRENT_SEQUENCE} | awk -F. -v OFS=. '{$NF++;print}')
+  echo "CURRENT_VERSION: $CURRENT_VERSION CURRENT_SEQUENCE: $CURRENT_SEQUENCE NEW_VERSION: $NEW_VERSION NEW_SEQUENCE: $NEW_SEQUENCE"
+  docker exec -ti cli-gsma cli/utils.sh setupChaincode $NEW_SEQUENCE $NEW_VERSION
+  docker exec -ti cli-dtag cli/utils.sh setupChaincode $NEW_SEQUENCE $NEW_VERSION
+  docker exec -ti cli-tmus cli/utils.sh setupChaincode $NEW_SEQUENCE $NEW_VERSION
+  docker exec -ti cli-gsma cli/utils.sh commitChaincode $NEW_SEQUENCE $NEW_VERSION
+}
 
 function setup_dtag() {
   docker exec -ti --user root restadapter-dtag node setup.js
@@ -137,39 +149,13 @@ function down() {
   docker volume prune --force
 }
 
-MODE=$1;shift
-
-if [ "${MODE}" == "setup" ]; then
-  setup $1
-elif [ "${MODE}" == "setup-explorer" ]; then
-  setup_explorer
-elif [ "${MODE}" == "package-chaincode" ]; then
-  package_chaincode $1 $2 $3 $4
-elif [ "${MODE}" == "install-chaincode" ]; then
-  install_chaincode $1 $2 $3
-elif [ "${MODE}" == "approve-chaincode" ]; then
-  approve_chaincode $1 $2 $3 $4
-elif [ "${MODE}" == "commit-chaincode" ]; then
-  commit_chaincode $1 $2 $3 $4
-elif [ "${MODE}" == "upgrade-chaincode" ]; then
-  upgrade_chaincode $1 $2 $3 $4
-elif [ "${MODE}" == "update-crl" ]; then
-  update_crl $1
-#elif [ "${MODE}" == "upgrade-webapp" ]; then
-#  upgrade_webapp $1
-elif [ "${MODE}" == "info" ]; then
-  info $1 $2
-elif [ "${MODE}" == "invoke" ]; then
-  invoke $1 $2
-elif [ "${MODE}" == "query" ]; then
-  query $1 $2
-elif [ "${MODE}" == "tty" ]; then
-  tty $1
-elif [ "${MODE}" == "test" ]; then
-  test
-elif [ "${MODE}" == "down" ]; then
-  down
+# Check if the function exists (bash specific)
+if declare -f "$1" > /dev/null
+then
+  # call arguments verbatim
+  "$@"
 else
-  printHelp
+  # Show a helpful error
+  echo "'$1' is not a known function name" >&2
   exit 1
 fi
