@@ -62,7 +62,7 @@ function setup_gsma() {
 function setup() {
   if [ $# -eq 0 ]; then
     setupChannel
-    setupChaincode
+    setupChaincodes
   else
     case $1 in
       dtag)
