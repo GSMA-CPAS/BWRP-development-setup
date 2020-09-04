@@ -7,7 +7,7 @@ ORDERER_CLIENT_KEYFILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto
 CHANNEL_NAME=roaming-contracts
 
 CHAINCODE_NAME="hybrid"
-CHAINCODE_VERSION="1.0.0"
+CHAINCODE_VERSION_DEFAULT="0.0.1"
 
 #PEER_CONN_PARMS="--peerAddresses peer0.dtag.nomad.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dtag.nomad.com/peers/peer0.dtag.nomad.com/tls/ca.crt"
 PEER_CONN_PARMS="--peerAddresses peer0.dtag.nomad.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dtag.nomad.com/peers/peer0.dtag.nomad.com/tls/ca.crt --peerAddresses peer0.tmus.nomad.com:9051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/tmus.nomad.com/peers/peer0.tmus.nomad.com/tls/ca.crt"
@@ -55,6 +55,7 @@ updateAnchorPeer() {
 
 packageChaincode() {
   set -x
+  CHAINCODE_VERSION=${1:-$CHAINCODE_VERSION_DEFAULT}
   peer lifecycle chaincode package cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz --path /opt/gopath/src/github.com/chaincode/${CHAINCODE_NAME}/ --label "${CHAINCODE_NAME}_v${CHAINCODE_VERSION}"
   res=$?
   set +x
@@ -62,6 +63,7 @@ packageChaincode() {
 
 installPackagedChaincode() {
   set -x
+  CHAINCODE_VERSION=${1:-$CHAINCODE_VERSION_DEFAULT}
   peer lifecycle chaincode install cli/${CHAINCODE_NAME}-v${CHAINCODE_VERSION}.tar.gz
   res=$?
   set +x
@@ -69,6 +71,7 @@ installPackagedChaincode() {
 
 approveChaincode() {
   SEQUENCE=$1
+  CHAINCODE_VERSION=${2:-$CHAINCODE_VERSION_DEFAULT}
   set -x
   peer lifecycle chaincode queryinstalled >&log.txt
   res=$?
@@ -84,6 +87,7 @@ approveChaincode() {
 
 commitChaincode() {
   SEQUENCE=$1
+  CHAINCODE_VERSION=${2:-$CHAINCODE_VERSION_DEFAULT}
   set -x
   peer lifecycle chaincode checkcommitreadiness -C ${CHANNEL_NAME} -n $CHAINCODE_NAME -v $CHAINCODE_VERSION --sequence $SEQUENCE --output json --tls --cafile $ORDERER_CA --clientauth --certfile $ORDERER_CLIENT_CERTFILE --keyfile $ORDERER_CLIENT_KEYFILE
   res=$?
@@ -190,7 +194,7 @@ function setupChannel {
 
 function setupChaincode {
   SEQUENCE=$1
-  packageChaincode
+  #packageChaincode
   installPackagedChaincode
   approveChaincode $SEQUENCE
 }
