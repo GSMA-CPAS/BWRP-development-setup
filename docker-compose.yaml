@@ -81,6 +81,21 @@ services:
   #
   # =================================================================== 
 
+  blockchain-adapter-dtag:
+    build: ./blockchain-adapter
+    container_name: blockchain-adapter-dtag
+    image: blockchain-adapter
+    restart: always
+    environment:
+      - BSA_PORT=${DTAG_BLOCKCHAIN_ADAPTER_PORT}
+      - BSA_CCP=ccp/DTAG.json
+    ports:
+      - ${DTAG_BLOCKCHAIN_ADAPTER_PORT}:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
+    depends_on:
+      - peer0.dtag.nomad.com
+    networks:
+      - nomad
+
   offchain-db-adapter-dtag:
     build: ./offchain_db_adapter
     container_name: offchain-db-adapter-dtag
