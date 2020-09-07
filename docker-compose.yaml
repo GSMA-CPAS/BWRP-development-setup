@@ -218,30 +218,6 @@ services:
     networks:
       - nomad
 
-  restadapter-dtag:
-    build: ./restadapter
-    container_name: restadapter-dtag
-    image: restadapter:${REST_ADAPTER_VERSION}
-    restart: always
-    environment:
-      DTAG_MYSQL_USER: ${DTAG_MYSQL_USER}
-      DTAG_MYSQL_PASSWORD: ${DTAG_MYSQL_PASSWORD}
-      DTAG_CA_ADMIN_ENROLLMENT_SECRET: ${DTAG_CA_ADMIN_ENROLLMENT_SECRET}
-      DTAG_CA_USER_ENROLLMENT_SECRET: ${DTAG_CA_USER_ENROLLMENT_SECRET}
-    volumes:
-      - ./organizations/dtag/webapp/certs:/app/certs
-      - ./organizations/dtag/webapp/config/custom-environment-variables.json:/app/config/custom-environment-variables.json
-      - ./organizations/dtag/webapp/config/production.json:/app/config/production.json
-      - ./organizations/dtag/webapp/offchain/connection.json:/app/offchain/connection.json
-    ports:
-      - 3010:3000
-    depends_on:
-      - db-dtag
-    networks:
-      - nomad
-    #extra_hosts:
-    #  - "storage.tmus.poc.com.local:${HOST_IP}"
-
   cli-dtag:
     container_name: cli-dtag
     image: hyperledger/fabric-tools:${HLF_VERSION}
@@ -407,30 +383,6 @@ services:
       - 3307:3306
     networks:
       - nomad
-
-  restadapter-tmus:
-    build: ./restadapter
-    container_name: restadapter-tmus
-    image: restadapter:${REST_ADAPTER_VERSION}
-    restart: always
-    environment:
-      TMUS_MYSQL_USER: ${TMUS_MYSQL_USER}
-      TMUS_MYSQL_PASSWORD: ${TMUS_MYSQL_PASSWORD}
-      TMUS_CA_ADMIN_ENROLLMENT_SECRET: ${TMUS_CA_ADMIN_ENROLLMENT_SECRET}
-      TMUS_CA_USER_ENROLLMENT_SECRET: ${TMUS_CA_USER_ENROLLMENT_SECRET}
-    volumes:
-      - ./organizations/tmus/webapp/certs:/app/certs
-      - ./organizations/tmus/webapp/config/custom-environment-variables.json:/app/config/custom-environment-variables.json
-      - ./organizations/tmus/webapp/config/production.json:/app/config/production.json
-      - ./organizations/tmus/webapp/offchain/connection.json:/app/offchain/connection.json
-    ports:
-      - 3020:3000
-    depends_on:
-      - db-tmus
-    networks:
-      - nomad
-    #extra_hosts:
-    #  - "storage.dtag.poc.com.local:${HOST_IP}"
 
   cli-tmus:
     container_name: cli-tmus
