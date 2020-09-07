@@ -261,6 +261,20 @@ services:
   # TMUS
   #
   # ===================================================================
+  blockchain-adapter-tmus:
+    build: ./blockchain-adapter
+    container_name: blockchain-adapter-tmus
+    image: blockchain-adapter
+    restart: always
+    environment:
+      - BSA_PORT=${TMUS_BLOCKCHAIN_ADAPTER_PORT}
+      - BSA_CCP=ccp/TMUS.json
+    ports:
+      - ${TMUS_BLOCKCHAIN_ADAPTER_PORT}:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
+    depends_on:
+      - peer0.tmus.nomad.com
+    networks:
+      - nomad
 
   offchain-db-adapter-tmus:
     build: ./offchain_db_adapter
