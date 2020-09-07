@@ -14,50 +14,28 @@ $ cd network-local
 $ git submodule update --init
 </pre>
 
-### (4) Create ``.env`` file in network-local (example .env-template)
+### (2) Create ``.env`` file in network-local (example .env-template)
 
 <pre>
-$ cd nomad/network-local
-$ vi .env
+$ cp .env-template .env
+$ vi .env #add passwords etc.
 </pre>
 
+### (3) Build required images
+
 <pre>
-COMPOSE_PROJECT_NAME=nomad
-HLF_VERSION=2.1.0
-HLF_CA_VERSION=1.4.6
-COUCHDB_VERSION=0.4.18
-WEBAPP_VERSION=1.0.0
-
-CLIENTAUTHREQUIRED=true
-
-DTAG_COUCHDB_USER=nomad
-DTAG_COUCHDB_PASSWORD=Grd5EfTg!dd
-DTAG_CA_ADMIN_ENROLLMENT_SECRET=73rwbu37rb37ruwbrw3r
-DTAG_CA_USER_ENROLLMENT_SECRET=fdjfh74bwbs74rwjrb
-DTAG_MYSQL_ROOT_PASSWORD=Ac3d!dewD
-DTAG_MYSQL_USER=nomad
-DTAG_MYSQL_PASSWORD=Fe3gtZ6!s4Fe
-
-TMUS_COUCHDB_USER=nomad
-TMUS_COUCHDB_PASSWORD=Grd5EfTg!dd
-TMUS_CA_ADMIN_ENROLLMENT_SECRET=73rwbu37rb37ruwbrw3r
-TMUS_CA_USER_ENROLLMENT_SECRET=fdjfh74bwbs74rwjrb
-TMUS_MYSQL_ROOT_PASSWORD=Ac3d!dewD
-TMUS_MYSQL_USER=nomad
-TMUS_MYSQL_PASSWORD=Fe3gtZ6!s4Fe
-
-GSMA_COUCHDB_USER=nomad
-GSMA_COUCHDB_PASSWORD=Grd5EfTg!dd
+$ docker-compose build
 </pre>
 
-### (5) Launch network
+### (4) Launch network
 
 <pre>
-$ cd network-local
 $ docker-compose up
 </pre>
 
-### (6) Setup network and restadapter
+Wait until cluster stable appears
+
+### (5) Setup channel and chaincode
 
 Open new tab in the current terminal
 
@@ -66,53 +44,32 @@ $ cd network-local
 $ ./nomad.sh setup
 </pre>
 
-## Test offchain communication
+Wait until chaincode is committed
 
-Query SetSQLDBConn to configure the chaincode to read/write to mysql database.
+## Test blockchain-adapter rest-api
 
+Install curl and jq:
 <pre>
-$ ./nomad.sh query dtag peer0
-$ ./nomad.sh query tmus peer0
+$ apt install jq curl
 </pre>
 
-Enter CLI container of organization DTAG:
-
+Run the test script:
 <pre>
-$ ./nomad.sh tty cli-dtag
+$ ./blockchain-adapter/test_query.sh
 </pre>
 
-Install curl:
+It should finish with:  Verified OK
 
+If it fails with hostname not found you can set the hostnames in /etc/hosts or run the script inside docker or change the hosts inside the script to localhost:
 <pre>
-$ apk --no-cache add curl
+BSA_DTAG="localhost:8080"
+BSA_TMUS="localhost:8081"
 </pre>
 
-SetData:
+## upgrade Chaincode
 
 <pre>
-$ curl -v -X POST "http://restadapter-dtag:3000/api/v1/offchain/setData/abcd?org=TMUS" -d'{"hello":"world"}'
-</pre>
-
-GetData:
-
-<pre>
-$ curl -v -X GET "http://restadapter-dtag:3000/api/v1/offchain/getData/abcd?org=TMUS&val=true"
-</pre>
-
-VerifyRemote:
-
-<pre>
-$ curl -v -X GET "http://restadapter-dtag:3000/api/v1/offchain/verifyRemote/abcd?org=TMUS"
-</pre>
-
-## Create new chaincode package (tar.gz)
-
-Example: create new chaincode package (v1.1.0) for organization DTAG. It will be stored in ``/organizations/dtag/cli/``. This package can later be used for all other organization.
-
-<pre>
-$ ./nomad.sh tty cli-dtag
-$ cd /opt/gopath/src/github.com/chaincode/offchain/1.0.0
-$ GO111MODULE=on go mod vendor
-$ cd /opt/gopath/src/github.com/hyperledger/fabric/peer
-$ peer lifecycle chaincode package cli/offchain-v1.0.0.tar.gz --path /opt/gopath/src/github.com/chaincode/offchain/1.0.0/ --label offchain_v1.1.0
+$ cd chaincode
+$ git pull
+$ ./nomad.sh upgradeChaincode
 </pre>
