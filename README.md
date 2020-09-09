@@ -71,5 +71,5 @@ BSA_TMUS="localhost:8081"
 <pre>
 $ cd chaincode
 $ git pull
-$ ./nomad.sh upgradeChaincode
+$ ./nomad.sh upgradeChaincodes
 </pre>
