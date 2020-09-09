@@ -62,8 +62,8 @@ It should finish with:  Verified OK
 
 If it fails with hostname not found you can set the hostnames in /etc/hosts or run the script inside docker or change the hosts inside the script to localhost:
 <pre>
-BSA_DTAG="localhost:8080"
-BSA_TMUS="localhost:8081"
+BSA_DTAG="localhost:8081"
+BSA_TMUS="localhost:8082"
 </pre>
 
 ## upgrade Chaincode
