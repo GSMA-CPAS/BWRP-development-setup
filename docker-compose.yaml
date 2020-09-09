@@ -204,20 +204,6 @@ services:
     networks:
       - nomad
 
-  db-dtag:
-    container_name: db-dtag
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DTAG_MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: dtag
-      MYSQL_USER: ${DTAG_MYSQL_USER}
-      MYSQL_PASSWORD: ${DTAG_MYSQL_PASSWORD}
-    ports:
-      - 3306:3306
-    networks:
-      - nomad
-
   cli-dtag:
     container_name: cli-dtag
     image: hyperledger/fabric-tools:${HLF_VERSION}
@@ -381,20 +367,6 @@ services:
       - COUCHDB_PASSWORD=${TMUS_COUCHDB_PASSWORD}
     ports:
       - 7984:5984
-    networks:
-      - nomad
-
-  db-tmus:
-    container_name: db-tmus
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${TMUS_MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: tmus
-      MYSQL_USER: ${TMUS_MYSQL_USER}
-      MYSQL_PASSWORD: ${TMUS_MYSQL_PASSWORD}
-    ports:
-      - 3307:3306
     networks:
       - nomad
 
