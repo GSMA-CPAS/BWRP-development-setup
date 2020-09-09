@@ -21,19 +21,19 @@ services:
   #
   # ===================================================================
 
-  #nginx-nomad:
-  #  container_name: nginx-nomad
-  #  image: nginx:1.17.5
-  #  restart: always
-  #  volumes:
-  #    - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #    - ./nginx/dtag:/etc/nginx/certs/dtag
-  #    - ./nginx/tmus:/etc/nginx/certs/tmus
-  #  ports:
-  #    - 80:80
-  #    - 443:443
-  #  networks:
-  #    - nomad
+#  nginx-nomad:
+#    container_name: nginx-nomad
+#    image: nginx:1.17.5
+#    restart: always
+#    volumes:
+#      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+#      - ./nginx/dtag:/etc/nginx/certs/dtag
+#      - ./nginx/tmus:/etc/nginx/certs/tmus
+#    ports:
+#      - 80:80
+#      - 443:443
+#    networks:
+#      - nomad
 
   # ===================================================================
   #
@@ -79,7 +79,55 @@ services:
   #
   # DTAG
   #
-  # ===================================================================
+  # =================================================================== 
+
+  blockchain-adapter-dtag:
+    build: ./blockchain-adapter
+    container_name: blockchain-adapter-dtag
+    image: blockchain-adapter
+    restart: always
+    environment:
+      - BSA_PORT=${DTAG_BLOCKCHAIN_ADAPTER_PORT}
+      - BSA_CCP=ccp/DTAG.json
+    ports:
+      - ${DTAG_BLOCKCHAIN_ADAPTER_PORT}:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
+    depends_on:
+      - peer0.dtag.nomad.com
+    networks:
+      - nomad
+
+  offchain-db-adapter-dtag:
+    build: ./offchain_db_adapter
+    container_name: offchain-db-adapter-dtag
+    image: offchain-db-adapter
+    restart: always
+    environment:
+      - ODBA_MYSQL_SERVER_HOST=offchain-db-dtag
+      - ODBA_MYSQL_SERVER_PORT=3306
+      - ODBA_MYSQL_USER=${DTAG_OFFCHAIN_MYSQL_USER}
+      - ODBA_MYSQL_PASSWORD=${DTAG_OFFCHAIN_MYSQL_PASSWORD}
+      - ODBA_MYSQL_DATABASE=${DTAG_OFFCHAIN_MYSQL_DB}
+      - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}      
+    ports:
+      - ${DTAG_OFFCHAIN_REST_PORT}:${DTAG_OFFCHAIN_REST_PORT}
+    depends_on:
+      - offchain-db-dtag
+    networks:
+      - nomad
+
+  offchain-db-dtag:
+    container_name: offchain-db-dtag
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DTAG_OFFCHAIN_MYSQL_DB}
+      MYSQL_USER: ${DTAG_OFFCHAIN_MYSQL_USER}
+      MYSQL_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_PASSWORD}
+    ports:
+      - 3326:3306
+    networks:
+      - nomad
 
   ca-dtag:
     container_name: ca-dtag
@@ -107,13 +155,13 @@ services:
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_nomad
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=peer0.dtag.nomad.com
-      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:7051
-      - CORE_PEER_LISTENADDRESS=peer0.dtag.nomad.com:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.dtag.nomad.com:7052
-      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.dtag.nomad.com:7052
+      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
+      - CORE_PEER_LISTENADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
+      - CORE_PEER_CHAINCODEADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_CHAINCODE_PORT}
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_CHAINCODE_PORT}
       - CORE_PEER_LOCALMSPID=DTAG
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.dtag.nomad.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.dtag.nomad.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_PROFILE_ENABLED=true
@@ -138,8 +186,7 @@ services:
       - ./crypto-config/peerOrganizations/dtag.nomad.com/users:/etc/hyperledger/fabric/users
       - peer0.dtag.nomad.com:/var/hyperledger/production
     ports:
-      - 7051:7051
-      - 7053:7053
+      - ${DTAG_PEER_PORT}:${DTAG_PEER_PORT}
     depends_on:
       - couchdb-peer0-dtag
     networks:
@@ -157,43 +204,6 @@ services:
     networks:
       - nomad
 
-  db-dtag:
-    container_name: db-dtag
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DTAG_MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: dtag
-      MYSQL_USER: ${DTAG_MYSQL_USER}
-      MYSQL_PASSWORD: ${DTAG_MYSQL_PASSWORD}
-    ports:
-      - 3306:3306
-    networks:
-      - nomad
-
-  restadapter-dtag:
-    container_name: restadapter-dtag
-    image: restadapter:${REST_ADAPTER_VERSION}
-    restart: always
-    environment:
-      DTAG_MYSQL_USER: ${DTAG_MYSQL_USER}
-      DTAG_MYSQL_PASSWORD: ${DTAG_MYSQL_PASSWORD}
-      DTAG_CA_ADMIN_ENROLLMENT_SECRET: ${DTAG_CA_ADMIN_ENROLLMENT_SECRET}
-      DTAG_CA_USER_ENROLLMENT_SECRET: ${DTAG_CA_USER_ENROLLMENT_SECRET}
-    volumes:
-      - ./organizations/dtag/webapp/certs:/app/certs
-      - ./organizations/dtag/webapp/config/custom-environment-variables.json:/app/config/custom-environment-variables.json
-      - ./organizations/dtag/webapp/config/production.json:/app/config/production.json
-      - ./organizations/dtag/webapp/offchain/connection.json:/app/offchain/connection.json
-    ports:
-      - 3010:3000
-    depends_on:
-      - db-dtag
-    networks:
-      - nomad
-    #extra_hosts:
-    #  - "storage.tmus.poc.com.local:${HOST_IP}"
-
   cli-dtag:
     container_name: cli-dtag
     image: hyperledger/fabric-tools:${HLF_VERSION}
@@ -201,11 +211,14 @@ services:
     tty: true
     stdin_open: true
     environment:
+      - ORG=dtag
+      - PORT=${DTAG_PEER_PORT}
+      - PEER=peer0
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli-dtag
-      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:7051
+      - CORE_PEER_ADDRESS=peer0.dtag.nomad.com:${DTAG_PEER_PORT}
       - CORE_PEER_LOCALMSPID=DTAG
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/dtag.nomad.com/users/Admin@dtag.nomad.com/msp
       - CORE_PEER_TLS_ENABLED=true
@@ -234,6 +247,53 @@ services:
   # TMUS
   #
   # ===================================================================
+  blockchain-adapter-tmus:
+    build: ./blockchain-adapter
+    container_name: blockchain-adapter-tmus
+    image: blockchain-adapter
+    restart: always
+    environment:
+      - BSA_PORT=${TMUS_BLOCKCHAIN_ADAPTER_PORT}
+      - BSA_CCP=ccp/TMUS.json
+    ports:
+      - ${TMUS_BLOCKCHAIN_ADAPTER_PORT}:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
+    depends_on:
+      - peer0.tmus.nomad.com
+    networks:
+      - nomad
+
+  offchain-db-adapter-tmus:
+    build: ./offchain_db_adapter
+    container_name: offchain-db-adapter-tmus
+    image: offchain-db-adapter
+    restart: always
+    environment:
+      - ODBA_MYSQL_SERVER_HOST=offchain-db-tmus
+      - ODBA_MYSQL_SERVER_PORT=3306
+      - ODBA_MYSQL_USER=${TMUS_OFFCHAIN_MYSQL_USER}
+      - ODBA_MYSQL_PASSWORD=${TMUS_OFFCHAIN_MYSQL_PASSWORD}
+      - ODBA_MYSQL_DATABASE=${TMUS_OFFCHAIN_MYSQL_DB}
+      - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}      
+    ports:
+      - ${TMUS_OFFCHAIN_REST_PORT}:${TMUS_OFFCHAIN_REST_PORT}
+    depends_on:
+      - offchain-db-tmus 
+    networks:
+      - nomad
+
+  offchain-db-tmus:
+    container_name: offchain-db-tmus
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${TMUS_OFFCHAIN_MYSQL_DB}
+      MYSQL_USER: ${TMUS_OFFCHAIN_MYSQL_USER}
+      MYSQL_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_PASSWORD}
+    ports:
+      - 3316:3306
+    networks:
+      - nomad
 
   ca-tmus:
     container_name: ca-tmus
@@ -261,13 +321,13 @@ services:
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_nomad
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=peer0.tmus.nomad.com
-      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:9051
-      - CORE_PEER_LISTENADDRESS=peer0.tmus.nomad.com:9051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.tmus.nomad.com:9052
-      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.tmus.nomad.com:9052
+      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
+      - CORE_PEER_LISTENADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
+      - CORE_PEER_CHAINCODEADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_CHAINCODE_PORT}
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_CHAINCODE_PORT}
       - CORE_PEER_LOCALMSPID=TMUS
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.tmus.nomad.com:9051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.tmus.nomad.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_PROFILE_ENABLED=true
@@ -292,8 +352,7 @@ services:
       - ./crypto-config/peerOrganizations/tmus.nomad.com/users:/etc/hyperledger/fabric/users
       - peer0.tmus.nomad.com:/var/hyperledger/production
     ports:
-      - 9051:9051
-      - 9053:9053
+      - ${TMUS_PEER_PORT}:${TMUS_PEER_PORT}
     depends_on:
       - couchdb-peer0-tmus
     networks:
@@ -311,43 +370,6 @@ services:
     networks:
       - nomad
 
-  db-tmus:
-    container_name: db-tmus
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${TMUS_MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: tmus
-      MYSQL_USER: ${TMUS_MYSQL_USER}
-      MYSQL_PASSWORD: ${TMUS_MYSQL_PASSWORD}
-    ports:
-      - 3307:3306
-    networks:
-      - nomad
-
-  restadapter-tmus:
-    container_name: restadapter-tmus
-    image: restadapter:${REST_ADAPTER_VERSION}
-    restart: always
-    environment:
-      TMUS_MYSQL_USER: ${TMUS_MYSQL_USER}
-      TMUS_MYSQL_PASSWORD: ${TMUS_MYSQL_PASSWORD}
-      TMUS_CA_ADMIN_ENROLLMENT_SECRET: ${TMUS_CA_ADMIN_ENROLLMENT_SECRET}
-      TMUS_CA_USER_ENROLLMENT_SECRET: ${TMUS_CA_USER_ENROLLMENT_SECRET}
-    volumes:
-      - ./organizations/tmus/webapp/certs:/app/certs
-      - ./organizations/tmus/webapp/config/custom-environment-variables.json:/app/config/custom-environment-variables.json
-      - ./organizations/tmus/webapp/config/production.json:/app/config/production.json
-      - ./organizations/tmus/webapp/offchain/connection.json:/app/offchain/connection.json
-    ports:
-      - 3020:3000
-    depends_on:
-      - db-tmus
-    networks:
-      - nomad
-    #extra_hosts:
-    #  - "storage.dtag.poc.com.local:${HOST_IP}"
-
   cli-tmus:
     container_name: cli-tmus
     image: hyperledger/fabric-tools:${HLF_VERSION}
@@ -355,11 +377,14 @@ services:
     tty: true
     stdin_open: true
     environment:
+      - ORG=tmus
+      - PORT=${TMUS_PEER_PORT}
+      - PEER=peer0
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli-tmus
-      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:9051
+      - CORE_PEER_ADDRESS=peer0.tmus.nomad.com:${TMUS_PEER_PORT}
       - CORE_PEER_LOCALMSPID=TMUS
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/tmus.nomad.com/users/Admin@tmus.nomad.com/msp
       - CORE_PEER_TLS_ENABLED=true
@@ -398,13 +423,13 @@ services:
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_nomad
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=peer0.gsma.nomad.com
-      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:10051
-      - CORE_PEER_LISTENADDRESS=peer0.gsma.nomad.com:10051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.gsma.nomad.com:10052
-      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.gsma.nomad.com:10052
+      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
+      - CORE_PEER_LISTENADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
+      - CORE_PEER_CHAINCODEADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_CHAINCODE_PORT}
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_CHAINCODE_PORT}
       - CORE_PEER_LOCALMSPID=GSMA
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.gsma.nomad.com:10051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.gsma.nomad.com:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_PROFILE_ENABLED=true
@@ -429,8 +454,7 @@ services:
       - ./crypto-config/peerOrganizations/gsma.nomad.com/users:/etc/hyperledger/fabric/users
       - peer0.gsma.nomad.com:/var/hyperledger/production
     ports:
-      - 10051:10051
-      - 10053:10053
+      - ${GSMA_PEER_PORT}:${GSMA_PEER_PORT}
     depends_on:
       - couchdb-peer0-gsma
     networks:
@@ -455,11 +479,14 @@ services:
     tty: true
     stdin_open: true
     environment:
+      - ORG=gsma
+      - PORT=${GSMA_PEER_PORT}
+      - PEER=peer0
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - FABRIC_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli-gsma
-      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:9051
+      - CORE_PEER_ADDRESS=peer0.gsma.nomad.com:${GSMA_PEER_PORT}
       - CORE_PEER_LOCALMSPID=GSMA
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/gsma.nomad.com/users/Admin@gsma.nomad.com/msp
       - CORE_PEER_TLS_ENABLED=true
