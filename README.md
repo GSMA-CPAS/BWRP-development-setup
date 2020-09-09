@@ -10,11 +10,11 @@
 ### (1) Clone git submodules
 
 <pre>
-$ cd network-local
+$ cd BWRP-development-setup
 $ git submodule update --init
 </pre>
 
-### (2) Create ``.env`` file in network-local (example .env-template)
+### (2) Create ``.env`` file in BWRP-development-setup (example .env-template)
 
 <pre>
 $ cp .env-template .env
@@ -40,7 +40,7 @@ Wait until cluster stable appears
 Open new tab in the current terminal
 
 <pre>
-$ cd network-local
+$ cd BWRP-development-setup
 $ ./nomad.sh setup
 </pre>
 
