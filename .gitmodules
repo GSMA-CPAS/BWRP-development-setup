@@ -1,9 +1,9 @@
 [submodule "offchain_db_adapter"]
 	path = offchain_db_adapter
-	url = https://git.trilobyte-se.de/git/nomad/nomad-gsma-atomic/offchain_db_adapter.git
+	url = https://github.com/GSMA-CPAS/BWRP-offchain-db-adapter
 [submodule "chaincode"]
 	path = chaincode
-	url = https://git.trilobyte-se.de/git/nomad/nomad-gsma-atomic/chaincode-bwrp.git
+	url = https://github.com/GSMA-CPAS/BWRP-chaincode
 [submodule "blockchain-adapter"]
 	path = blockchain-adapter
-	url = https://git.trilobyte-se.de/git/nomad/nomad-gsma-atomic/blockchain-adapter.git
+	url = https://github.com/GSMA-CPAS/BWRP-blockchain-adapter
