@@ -82,7 +82,9 @@ services:
   # =================================================================== 
 
   blockchain-adapter-dtag:
-    build: ./blockchain-adapter/server
+    build:
+      context: ./blockchain-adapter
+      dockerfile: server/Dockerfile
     container_name: blockchain-adapter-dtag
     image: blockchain-adapter
     restart: always
@@ -248,7 +250,9 @@ services:
   #
   # ===================================================================
   blockchain-adapter-tmus:
-    build: ./blockchain-adapter/server
+    build: 
+      context: ./blockchain-adapter
+      dockerfile: server/Dockerfile
     container_name: blockchain-adapter-tmus
     image: blockchain-adapter
     restart: always
