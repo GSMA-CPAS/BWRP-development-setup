@@ -1,3 +1,5 @@
 .env
 mocks
 vendor
+organizations/*/cli/hybrid-*.tar.gz
+organizations/*/cli/utils.sh
