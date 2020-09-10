@@ -88,7 +88,7 @@ services:
     restart: always
     environment:
       - BSA_PORT=${DTAG_BLOCKCHAIN_ADAPTER_PORT}
-      - BSA_CCP=ccp/DTAG.json
+      - BSA_CCP=../config/ccp/DTAG.json
     ports:
       - ${DTAG_BLOCKCHAIN_ADAPTER_PORT}:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
     depends_on:
@@ -254,7 +254,7 @@ services:
     restart: always
     environment:
       - BSA_PORT=${TMUS_BLOCKCHAIN_ADAPTER_PORT}
-      - BSA_CCP=ccp/TMUS.json
+      - BSA_CCP=../config/ccp/TMUS.json
     ports:
       - ${TMUS_BLOCKCHAIN_ADAPTER_PORT}:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
     depends_on:
