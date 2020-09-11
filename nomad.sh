@@ -12,6 +12,7 @@ function printHelp() {
   echo "  nomad.sh update-crl <org>"
   echo "  nomad.sh info <org> <peer>"
   echo "  nomad.sh tty <container-name>"
+  echo "  nomad.sh rebuild <name>"
   echo "  nomad.sh down"
   echo
 }
@@ -134,6 +135,12 @@ function query() {
 function tty() {
   CONTAINER_ID_OR_NAME=$1
   docker exec -ti --user root $CONTAINER_ID_OR_NAME /bin/sh
+}
+
+function rebuild() {
+  NAME=$1
+  docker-compose build $NAME
+  docker-compose up -d --remove-orphans
 }
 
 function down() {
