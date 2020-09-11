@@ -82,15 +82,13 @@ services:
   # =================================================================== 
 
   blockchain-adapter-dtag:
-    build:
-      context: ./blockchain-adapter
-      dockerfile: server/Dockerfile
+    build: ./blockchain-adapter/server
     container_name: blockchain-adapter-dtag
     image: blockchain-adapter
     restart: always
     environment:
       - BSA_PORT=${DTAG_BLOCKCHAIN_ADAPTER_PORT}
-      - BSA_CCP=../config/ccp/DTAG.json
+      - BSA_CCP=./ccp/DTAG.json
     ports:
       - ${DTAG_BLOCKCHAIN_ADAPTER_PORT}:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
     depends_on:
@@ -250,15 +248,13 @@ services:
   #
   # ===================================================================
   blockchain-adapter-tmus:
-    build: 
-      context: ./blockchain-adapter
-      dockerfile: server/Dockerfile
+    build: ./blockchain-adapter/server
     container_name: blockchain-adapter-tmus
     image: blockchain-adapter
     restart: always
     environment:
       - BSA_PORT=${TMUS_BLOCKCHAIN_ADAPTER_PORT}
-      - BSA_CCP=../config/ccp/TMUS.json
+      - BSA_CCP=./ccp/TMUS.json
     ports:
       - ${TMUS_BLOCKCHAIN_ADAPTER_PORT}:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
     depends_on:
