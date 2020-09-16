@@ -144,7 +144,7 @@ function rebuild() {
 }
 
 function down() {
-  filter='hyperledger\|dev-peer\|mysql\|nginx\|restadapter\|offchain|blockchain-adapter'
+  filter='hyperledger\|dev-peer\|mysql\|nginx\|restadapter\|offchain\|blockchain-adapter'
   #docker stop $(docker ps -a -q)
   docker stop $(docker ps -a | grep $filter | awk '{print $1}')
   #docker kill $(docker ps -q)
