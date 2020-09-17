@@ -7,15 +7,16 @@ fi
 
 BRANCH=$1
 
+BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 DIRS=( "blockchain-adapter" "chaincode" "offchain_db_adapter" )
 
 for dir in "${DIRS[@]}"
 do
   echo "> processing $dir, checking out $BRANCH"
-  cd $dir
+  cd $BASE/../$dir
   git pull
   git checkout $BRANCH
   git pull
-  cd ..
 done
 

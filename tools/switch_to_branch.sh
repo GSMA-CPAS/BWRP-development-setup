@@ -6,10 +6,15 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
+BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 BRANCH=$1
 
+cd $BASE/..
+
 git checkout $BRANCH
-./update_submodules.sh $BRANCH
+
+$BASE/update_submodules.sh $BRANCH
 
 echo "done. now run"
 echo ""
