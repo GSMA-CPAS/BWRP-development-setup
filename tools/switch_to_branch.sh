@@ -12,7 +12,9 @@ BRANCH=$1
 
 cd $BASE/..
 
-git checkout $BRANCH
+# DO NOT checkout the branch in this repo 
+# make sure to take care of this on your own
+# git checkout $BRANCH
 
 $BASE/update_submodules.sh $BRANCH
 

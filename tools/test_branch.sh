@@ -10,19 +10,19 @@ BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cd $BASE/..
 
-sudo ./nomad.sh down
+./nomad.sh down
 
-/tools/switch_to_branch.sh $1
+./tools/switch_to_branch.sh $1
 
-sudo docker-compose up -d
+docker-compose up -d
 
 sleep 5
 
-sudo docker-compose logs -t | tail
+docker-compose logs -t | tail
 
 echo "> docker should be up and running now"
 
-sudo ./nomad.sh setup
+./nomad.sh setup
 
 echo "> waiting for chaincode to be up"
 sleep 15
