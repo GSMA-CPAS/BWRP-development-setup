@@ -12,7 +12,7 @@ cd $BASE/..
 
 sudo ./nomad.sh down
 
-sudo ./tools/switch_to_branch.sh $1
+/tools/switch_to_branch.sh $1
 
 sudo docker-compose up -d
 
