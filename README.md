@@ -24,13 +24,13 @@ $ vi .env #add passwords etc.
 ### (3) Build required images
 
 <pre>
-$ docker-compose build
+$ ./nomad.sh build
 </pre>
 
 ### (4) Launch network
 
 <pre>
-$ docker-compose up
+$ ./nomad.sh up
 </pre>
 
 Wait until cluster stable appears

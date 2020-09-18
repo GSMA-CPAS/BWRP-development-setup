@@ -14,9 +14,11 @@ cd $BASE/..
 
 ./tools/switch_to_branch.sh $1
 
+docker-compose build
+
 docker-compose up -d
 
-sleep 5
+sleep 35
 
 docker-compose logs -t | tail
 

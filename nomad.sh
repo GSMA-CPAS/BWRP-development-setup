@@ -137,10 +137,21 @@ function tty() {
   docker exec -ti --user root $CONTAINER_ID_OR_NAME /bin/sh
 }
 
+
+function build() {
+  HASH=$(cat .git/modules/blockchain-adapter/FETCH_HEAD | head -1 | cut -f1)
+  echo $BSA_COMMIT_HASH
+  docker-compose build --build-arg BSA_COMMIT_HASH="$HASH" $1 || exit 1
+}
+
 function rebuild() {
   NAME=$1
-  docker-compose build $NAME
+  build $NAME
   docker-compose up -d --remove-orphans
+}
+
+function up() {
+  docker-compose up 
 }
 
 function down() {
