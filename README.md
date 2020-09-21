@@ -4,7 +4,7 @@
 
 * Docker & Docker-Compose
 * Linux or MAC OS X
-* OpenSSL 1.1.1 or higher
+* OpenSSL 1.1.1
 
 ## Installation
 
