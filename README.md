@@ -4,6 +4,7 @@
 
 * Docker & Docker-Compose
 * Linux or MAC OS X
+* OpenSSL 1.1.1 or higher
 
 ## Installation
 
@@ -26,6 +27,13 @@ $ vi .env #add passwords etc.
 <pre>
 $ ./nomad.sh build
 </pre>
+
+Possible issues: 
+-  ERROR: Pool overlaps with other one on this address space / or other resources on docker/
+Free the needed resource or change the used one, examle prune/free the used network or change the netowrk range in docker-compose.yaml.
+-  ERROR: Service 'blockchain-adapter-tmus' failed to build: Get https://registry-1.docker.io/v2/: dial tcp: lookup registry-1.docker.io on [::1]:53: read udp [::1]:41959->[::1]:53: read: connection refused
+edit /etc/resolve.comf to include:
+nameserver 8.8.8.8
 
 ### (4) Launch network
 
