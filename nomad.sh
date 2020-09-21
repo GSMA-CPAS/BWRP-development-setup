@@ -139,8 +139,7 @@ function tty() {
 
 
 function build() {
-  HASH=$(cat .git/modules/blockchain-adapter/FETCH_HEAD | head -1 | cut -f1)
-  echo $BSA_COMMIT_HASH
+  HASH=$(cat .git/modules/blockchain-adapter/HEAD || echo "NO_HEAD" | head -1 | cut -f1)
   docker-compose build --build-arg BSA_COMMIT_HASH="$HASH" $1 || exit 1
 }
 
