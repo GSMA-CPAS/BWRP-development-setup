@@ -21,19 +21,19 @@ services:
   #
   # ===================================================================
 
-#  nginx-nomad:
-#    container_name: nginx-nomad
-#    image: nginx:1.17.5
-#    restart: always
-#    volumes:
-#      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-#      - ./nginx/dtag:/etc/nginx/certs/dtag
-#      - ./nginx/tmus:/etc/nginx/certs/tmus
-#    ports:
-#      - 80:80
-#      - 443:443
-#    networks:
-#      - nomad
+  nginx-nomad:
+    container_name: nginx-nomad
+    image: nginx:1.17.5
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/dtag:/etc/nginx/certs/dtag
+      - ./nginx/tmus:/etc/nginx/certs/tmus
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - nomad
 
   # ===================================================================
   #
@@ -79,7 +79,7 @@ services:
   #
   # DTAG
   #
-  # =================================================================== 
+  # ===================================================================
 
   blockchain-adapter-dtag:
     build: ./blockchain-adapter/server
@@ -107,7 +107,7 @@ services:
       - ODBA_MYSQL_USER=${DTAG_OFFCHAIN_MYSQL_USER}
       - ODBA_MYSQL_PASSWORD=${DTAG_OFFCHAIN_MYSQL_PASSWORD}
       - ODBA_MYSQL_DATABASE=${DTAG_OFFCHAIN_MYSQL_DB}
-      - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}      
+      - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}
     ports:
       - ${DTAG_OFFCHAIN_REST_PORT}:${DTAG_OFFCHAIN_REST_PORT}
     depends_on:
@@ -126,6 +126,26 @@ services:
       MYSQL_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_PASSWORD}
     ports:
       - 3326:3306
+    networks:
+      - nomad
+
+  webapp-dtag:
+    #build: ./webapp
+    container_name: webapp-dtag
+    image: webapp
+    restart: always
+    environment:
+      DTAG_MYSQL_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_PASSWORD}
+      DTAG_CA_ADMIN_ENROLLMENT_SECRET: ${DTAG_CA_ADMIN_ENROLLMENT_SECRET}
+      DTAG_CA_USER_ENROLLMENT_SECRET: ${DTAG_CA_USER_ENROLLMENT_SECRET}
+    volumes:
+      - ./organizations/dtag/webapp/certs:/app/certs
+      - ./organizations/dtag/webapp/config/custom-environment-variables.json:/webapp/config/custom-environment-variables.json
+      - ./organizations/dtag/webapp/config/production.json:/webapp/config/production.json
+    ports:
+      - 3010:3000
+    depends_on:
+      - offchain-db-dtag
     networks:
       - nomad
 
@@ -273,11 +293,11 @@ services:
       - ODBA_MYSQL_USER=${TMUS_OFFCHAIN_MYSQL_USER}
       - ODBA_MYSQL_PASSWORD=${TMUS_OFFCHAIN_MYSQL_PASSWORD}
       - ODBA_MYSQL_DATABASE=${TMUS_OFFCHAIN_MYSQL_DB}
-      - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}      
+      - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}
     ports:
       - ${TMUS_OFFCHAIN_REST_PORT}:${TMUS_OFFCHAIN_REST_PORT}
     depends_on:
-      - offchain-db-tmus 
+      - offchain-db-tmus
     networks:
       - nomad
 
@@ -295,6 +315,26 @@ services:
     networks:
       - nomad
 
+  webapp-tmus:
+    #build: ./webapp
+    container_name: webapp-tmus
+    image: webapp
+    restart: always
+    environment:
+      TMUS_MYSQL_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_PASSWORD}
+      TMUS_CA_ADMIN_ENROLLMENT_SECRET: ${TMUS_CA_ADMIN_ENROLLMENT_SECRET}
+      TMUS_CA_USER_ENROLLMENT_SECRET: ${TMUS_CA_USER_ENROLLMENT_SECRET}
+    volumes:
+      - ./organizations/tmus/webapp/certs:/app/certs
+      - ./organizations/tmus/webapp/config/custom-environment-variables.json:/webapp/config/custom-environment-variables.json
+      - ./organizations/tmus/webapp/config/production.json:/webapp/config/production.json
+    ports:
+      - 3020:3000
+    depends_on:
+      - offchain-db-tmus
+    networks:
+      - nomad
+      
   ca-tmus:
     container_name: ca-tmus
     image: hyperledger/fabric-ca:${HLF_CA_VERSION}

@@ -47,12 +47,12 @@ function upgradeChaincodes() {
 }
 
 function setup_dtag() {
-  docker exec -ti --user root restadapter-dtag node setup.js
+  docker exec -ti --user nomad webapp-dtag node setup.js
   docker exec -ti cli-dtag cli/script.sh setup
 }
 
 function setup_tmus() {
-  docker exec -ti --user root restadapter-tmus node setup.js
+  docker exec -ti --user nomad webapp-tmus node setup.js
   docker exec -ti cli-tmus cli/script.sh setup
 }
 
@@ -150,7 +150,7 @@ function rebuild() {
 }
 
 function up() {
-  docker-compose up 
+  docker-compose up
 }
 
 function down() {

@@ -1,12 +1,50 @@
 {
+  "organization": {
+    "mspid": "DTAG",
+    "title": "Deutsche Telekom"
+  },
+
   "database": {
-    "pooling": true,
     "connection": {
-      "host": "db-dtag",
+      "host": "offchain-db-dtag",
       "port": 3306,
-      "user": "",
+      "user": "odba",
       "password": "",
-      "database": "dtag"
+      "database": "odba"
+    }
+  },
+
+  "apps": {
+    "roaming": {
+      "name": "roaming",
+      "enabled": true,
+      "packageName": "nodenect-app-roaming",
+      "displayName": "Roaming",
+      "config": {
+        "monitoring": false
+      }
+    }
+  },
+
+  "backendAdapters": {
+    "CertAuthAdapter": {
+      "config": {
+        "mspid": "DTAG",
+        "url": "http://ca-dtag:7054",
+        "caName": "ca.nomad.com",
+        "adminEnrollmentId": "admin",
+        "adminEnrollmentSecret": "",
+        "userEnrollmentSecret": "",
+        "tlsOptions": {
+          "trustedRoots": [],
+          "verify": false
+        }
+      }
+    },
+    "BlockchainAdapter": {
+      "config": {
+        "url": "http://blockchain-adapter-dtag:8081"
+      }
     }
   }
 }

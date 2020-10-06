@@ -1,8 +1,15 @@
 {
   "database": {
     "connection": {
-      "user": "DTAG_MYSQL_USER",
       "password": "DTAG_MYSQL_PASSWORD"
+    }
+  },
+  "backendAdapters": {
+    "CertAuthAdapter": {
+      "config": {
+        "adminEnrollmentSecret": "DTAG_CA_ADMIN_ENROLLMENT_SECRET",
+        "userEnrollmentSecret": "DTAG_CA_USER_ENROLLMENT_SECRET"
+      }
     }
   }
 }
