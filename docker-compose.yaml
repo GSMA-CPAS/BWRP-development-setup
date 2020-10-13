@@ -145,7 +145,21 @@ services:
     ports:
       - 3010:3000
     depends_on:
-      - offchain-db-dtag
+      - webapp-db-dtag
+    networks:
+      - nomad
+
+  webapp-db-dtag:
+    container_name: webapp-db-dtag
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DTAG_WEBAPP_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DTAG_WEBAPP_DB_NAME}
+      MYSQL_USER: ${DTAG_WEBAPP_DB_USER}
+      MYSQL_PASSWORD: ${DTAG_WEBAPP_DB_PASSWORD}
+    ports:
+      - 3366:3306
     networks:
       - nomad
 
@@ -267,6 +281,7 @@ services:
   # TMUS
   #
   # ===================================================================
+
   blockchain-adapter-tmus:
     build: ./blockchain-adapter/server
     container_name: blockchain-adapter-tmus
@@ -331,10 +346,24 @@ services:
     ports:
       - 3020:3000
     depends_on:
-      - offchain-db-tmus
+      - webapp-db-tmus
     networks:
       - nomad
-      
+
+  webapp-db-tmus:
+    container_name: webapp-db-tmus
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${TMUS_WEBAPP_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${TMUS_WEBAPP_DB_NAME}
+      MYSQL_USER: ${TMUS_WEBAPP_DB_USER}
+      MYSQL_PASSWORD: ${TMUS_WEBAPP_DB_PASSWORD}
+    ports:
+      - 3367:3306
+    networks:
+      - nomad
+
   ca-tmus:
     container_name: ca-tmus
     image: hyperledger/fabric-ca:${HLF_CA_VERSION}

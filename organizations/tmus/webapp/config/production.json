@@ -6,11 +6,11 @@
 
   "database": {
     "connection": {
-      "host": "offchain-db-tmus",
+      "host": "webapp-db-tmus",
       "port": 3306,
-      "user": "odba",
+      "user": "nomad",
       "password": "",
-      "database": "odba"
+      "database": "tmus"
     }
   },
 
@@ -21,7 +21,6 @@
       "packageName": "nodenect-app-roaming",
       "displayName": "Roaming",
       "config": {
-        "monitoring": false
       }
     }
   },
@@ -43,7 +42,11 @@
     },
     "BlockchainAdapter": {
       "config": {
-        "url": "http://blockchain-adapter-dtag:8082"
+        "url": "http://blockchain-adapter-tmus:8082",
+        "webhooks": [
+          {"eventName": "STORE:DOCUMENTHASH", "callbackUrl": "http://webapp-tmus:3000/api/v1/documents/event"},
+          {"eventName": "STORE:SIGNATURE", "callbackUrl": "http://webapp-tmus:3000/api/v1/signatures/event"}
+        ]
       }
     }
   }

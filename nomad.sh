@@ -33,6 +33,13 @@ function setupChaincodes() {
   docker exec -ti cli-gsma cli/utils.sh commitChaincode 1
 }
 
+function setupWebapp() {
+  echo "setting up webapp"
+  docker exec -ti --user nomad webapp-dtag node setup.js
+  docker exec -ti --user nomad webapp-tmus node setup.js
+}
+
+
 function upgradeChaincodes() {
   echo "upgrade chaincodes"
   CURRENT_VERSION=$(docker exec -ti cli-gsma peer lifecycle chaincode querycommitted -C roaming-contracts | tail -n1 | cut -f4 -d" " | cut -d"," -f1)
@@ -64,6 +71,7 @@ function setup() {
   if [ $# -eq 0 ]; then
     setupChannel
     setupChaincodes
+    setupWebapp
   else
     case $1 in
       dtag)

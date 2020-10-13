@@ -6,11 +6,11 @@
 
   "database": {
     "connection": {
-      "host": "offchain-db-dtag",
+      "host": "webapp-db-dtag",
       "port": 3306,
-      "user": "odba",
+      "user": "nomad",
       "password": "",
-      "database": "odba"
+      "database": "dtag"
     }
   },
 
@@ -21,7 +21,6 @@
       "packageName": "nodenect-app-roaming",
       "displayName": "Roaming",
       "config": {
-        "monitoring": false
       }
     }
   },
@@ -43,7 +42,11 @@
     },
     "BlockchainAdapter": {
       "config": {
-        "url": "http://blockchain-adapter-dtag:8081"
+        "url": "http://blockchain-adapter-dtag:8081",
+        "webhooks": [
+          {"eventName": "STORE:DOCUMENTHASH", "callbackUrl": "http://webapp-dtag:3000/api/v1/documents/event"},
+          {"eventName": "STORE:SIGNATURE", "callbackUrl": "http://webapp-dtag:3000/api/v1/signatures/event"}
+        ]
       }
     }
   }
