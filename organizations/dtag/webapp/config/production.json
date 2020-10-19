@@ -18,7 +18,7 @@
     "roaming": {
       "name": "roaming",
       "enabled": true,
-      "packageName": "nodenect-app-roaming",
+      "packageName": "app-roaming",
       "displayName": "Roaming",
       "config": {
       }
@@ -28,7 +28,6 @@
   "backendAdapters": {
     "CertAuthAdapter": {
       "config": {
-        "mspid": "DTAG",
         "url": "http://ca-dtag:7054",
         "caName": "ca.nomad.com",
         "adminEnrollmentId": "admin",
