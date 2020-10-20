@@ -22,20 +22,27 @@ $ cp .env-template .env
 $ vi .env #add passwords etc.
 </pre>
 
-### (3) Build required images
+### (3) Update ``/etc/hosts``. Replace 192.168.2.119 with your host ip
+
+<pre>
+192.168.2.119  dtag.poc.com.local
+192.168.2.119  tmus.poc.com.local
+</pre>
+
+### (4) Build required images
 
 <pre>
 $ ./nomad.sh build
 </pre>
 
-Possible issues: 
+Possible issues:
 -  ERROR: Pool overlaps with other one on this address space / or other resources on docker/
 Free the needed resource or change the used one, examle prune/free the used network or change the netowrk range in docker-compose.yaml.
 -  ERROR: Service 'blockchain-adapter-tmus' failed to build: Get https://registry-1.docker.io/v2/: dial tcp: lookup registry-1.docker.io on [::1]:53: read udp [::1]:41959->[::1]:53: read: connection refused
 edit /etc/resolve.comf to include:
 nameserver 8.8.8.8
 
-### (4) Launch network
+### (5) Launch network
 
 <pre>
 $ ./nomad.sh up
@@ -43,7 +50,7 @@ $ ./nomad.sh up
 
 Wait until cluster stable appears
 
-### (5) Setup channel and chaincode
+### (6) Setup channel and chaincode
 
 Open new tab in the current terminal
 
