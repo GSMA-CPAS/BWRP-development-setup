@@ -130,7 +130,7 @@ services:
       - nomad
 
   webapp-dtag:
-    #build: ./webapp
+    build: ./ui/webapp
     container_name: webapp-dtag
     image: webapp
     restart: always
@@ -331,7 +331,7 @@ services:
       - nomad
 
   webapp-tmus:
-    #build: ./webapp
+    build: ./ui/webapp
     container_name: webapp-tmus
     image: webapp
     restart: always
