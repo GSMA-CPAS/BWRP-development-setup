@@ -7,3 +7,7 @@
 [submodule "blockchain-adapter"]
 	path = blockchain-adapter
 	url = https://github.com/GSMA-CPAS/BWRP-blockchain-adapter
+[submodule "ui"]
+	path = ui
+	url = https://github.com/GSMA-CPAS/BWRP-UI
+	branch = master
