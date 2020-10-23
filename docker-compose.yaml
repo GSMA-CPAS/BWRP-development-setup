@@ -135,9 +135,9 @@ services:
     image: webapp
     restart: always
     environment:
-      DTAG_MYSQL_PASSWORD: ${DTAG_WEBAPP_DB_PASSWORD}
-      DTAG_CA_ADMIN_ENROLLMENT_SECRET: ${DTAG_CA_ADMIN_ENROLLMENT_SECRET}
-      DTAG_CA_USER_ENROLLMENT_SECRET: ${DTAG_CA_USER_ENROLLMENT_SECRET}
+      WEBAPP_MYSQL_PASSWORD: ${DTAG_WEBAPP_DB_PASSWORD}
+      WEBAPP_CA_ADMIN_ENROLLMENT_SECRET: ${DTAG_CA_ADMIN_ENROLLMENT_SECRET}
+      WEBAPP_CA_USER_ENROLLMENT_SECRET: ${DTAG_CA_USER_ENROLLMENT_SECRET}
     volumes:
       - ./organizations/dtag/webapp/certs:/app/certs
       - ./organizations/dtag/webapp/config/custom-environment-variables.json:/webapp/config/custom-environment-variables.json
@@ -336,9 +336,9 @@ services:
     image: webapp
     restart: always
     environment:
-      TMUS_MYSQL_PASSWORD: ${TMUS_WEBAPP_DB_PASSWORD}
-      TMUS_CA_ADMIN_ENROLLMENT_SECRET: ${TMUS_CA_ADMIN_ENROLLMENT_SECRET}
-      TMUS_CA_USER_ENROLLMENT_SECRET: ${TMUS_CA_USER_ENROLLMENT_SECRET}
+      WEBAPP_MYSQL_PASSWORD: ${TMUS_WEBAPP_DB_PASSWORD}
+      WEBAPP_CA_ADMIN_ENROLLMENT_SECRET: ${TMUS_CA_ADMIN_ENROLLMENT_SECRET}
+      WEBAPP_CA_USER_ENROLLMENT_SECRET: ${TMUS_CA_USER_ENROLLMENT_SECRET}
     volumes:
       - ./organizations/tmus/webapp/certs:/app/certs
       - ./organizations/tmus/webapp/config/custom-environment-variables.json:/webapp/config/custom-environment-variables.json

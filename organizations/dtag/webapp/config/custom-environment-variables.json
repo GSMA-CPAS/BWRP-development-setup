@@ -1,14 +1,14 @@
 {
   "database": {
     "connection": {
-      "password": "DTAG_MYSQL_PASSWORD"
+      "password": "WEBAPP_MYSQL_PASSWORD"
     }
   },
   "backendAdapters": {
     "CertAuthAdapter": {
       "config": {
-        "adminEnrollmentSecret": "DTAG_CA_ADMIN_ENROLLMENT_SECRET",
-        "userEnrollmentSecret": "DTAG_CA_USER_ENROLLMENT_SECRET"
+        "adminEnrollmentSecret": "WEBAPP_CA_ADMIN_ENROLLMENT_SECRET",
+        "userEnrollmentSecret": "WEBAPP_CA_USER_ENROLLMENT_SECRET"
       }
     }
   }

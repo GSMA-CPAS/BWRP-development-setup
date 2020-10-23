@@ -1,14 +1,14 @@
 {
   "database": {
     "connection": {
-      "password": "TMUS_MYSQL_PASSWORD"
+      "password": "WEBAPP_MYSQL_PASSWORD"
     }
   },
   "backendAdapters": {
     "CertAuthAdapter": {
       "config": {
-        "adminEnrollmentSecret": "TMUS_CA_ADMIN_ENROLLMENT_SECRET",
-        "userEnrollmentSecret": "TMUS_CA_USER_ENROLLMENT_SECRET"
+        "adminEnrollmentSecret": "WEBAPP_CA_ADMIN_ENROLLMENT_SECRET",
+        "userEnrollmentSecret": "WEBAPP_CA_USER_ENROLLMENT_SECRET"
       }
     }
   }
