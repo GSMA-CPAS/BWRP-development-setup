@@ -61,6 +61,22 @@ $ ./nomad.sh setup
 
 Wait until chaincode is committed
 
+### (7) Launch webapp
+
+**DTAG**
+
+Url: https://dtag.poc.com.local
+
+
+Login as admin (password is admin)
+
+**TMUS**
+
+Url: https://tmus.poc.com.local
+
+
+Login as admin (password is admin)
+
 ## Test blockchain-adapter rest-api
 
 Install curl and jq:
