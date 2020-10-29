@@ -1,12 +1,52 @@
 {
+  "organization": {
+    "mspid": "TMUS",
+    "title": "T-Mobile US"
+  },
+
   "database": {
-    "pooling": true,
     "connection": {
-      "host": "db-tmus",
+      "host": "webapp-db-tmus",
       "port": 3306,
-      "user": "",
+      "user": "nomad",
       "password": "",
       "database": "tmus"
+    }
+  },
+
+  "apps": {
+    "roaming": {
+      "name": "roaming",
+      "enabled": true,
+      "packageName": "app-roaming",
+      "displayName": "Roaming",
+      "config": {
+      }
+    }
+  },
+
+  "backendAdapters": {
+    "CertAuthAdapter": {
+      "config": {
+        "url": "http://ca-tmus:7054",
+        "caName": "ca.nomad.com",
+        "adminEnrollmentId": "admin",
+        "adminEnrollmentSecret": "",
+        "userEnrollmentSecret": "",
+        "tlsOptions": {
+          "trustedRoots": [],
+          "verify": false
+        }
+      }
+    },
+    "BlockchainAdapter": {
+      "config": {
+        "url": "http://blockchain-adapter-tmus:8082",
+        "webhooks": [
+          {"eventName": "STORE:DOCUMENTHASH", "callbackUrl": "http://webapp-tmus:3000/api/v1/documents/event"},
+          {"eventName": "STORE:SIGNATURE", "callbackUrl": "http://webapp-tmus:3000/api/v1/signatures/event"}
+        ]
+      }
     }
   }
 }

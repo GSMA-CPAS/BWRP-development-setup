@@ -33,6 +33,16 @@ function setupChaincodes() {
   docker exec -ti cli-gsma cli/utils.sh commitChaincode 1
 }
 
+function setupWebapp() {
+  docker-compose restart blockchain-adapter-dtag
+  docker-compose restart blockchain-adapter-tmus
+  curl -s -X PUT http://localhost:8081/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-dtag:3333"}' -H "Content-Type: application/json" > /dev/null
+  curl -s -X PUT http://localhost:8082/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-tmus:3334"}' -H "Content-Type: application/json" > /dev/null
+  echo "setting up webapp"
+  docker exec -ti --user nomad webapp-dtag node setup.js
+  docker exec -ti --user nomad webapp-tmus node setup.js
+}
+
 function upgradeChaincodes() {
   echo "upgrade chaincodes"
   CURRENT_VERSION=$(docker exec -ti cli-gsma peer lifecycle chaincode querycommitted -C roaming-contracts | tail -n1 | cut -f4 -d" " | cut -d"," -f1)
@@ -47,12 +57,12 @@ function upgradeChaincodes() {
 }
 
 function setup_dtag() {
-  docker exec -ti --user root restadapter-dtag node setup.js
+  docker exec -ti --user nomad webapp-dtag node setup.js
   docker exec -ti cli-dtag cli/script.sh setup
 }
 
 function setup_tmus() {
-  docker exec -ti --user root restadapter-tmus node setup.js
+  docker exec -ti --user nomad webapp-tmus node setup.js
   docker exec -ti cli-tmus cli/script.sh setup
 }
 
@@ -64,6 +74,7 @@ function setup() {
   if [ $# -eq 0 ]; then
     setupChannel
     setupChaincodes
+    setupWebapp
   else
     case $1 in
       dtag)
@@ -150,7 +161,7 @@ function rebuild() {
 }
 
 function up() {
-  docker-compose up 
+  docker-compose up
 }
 
 function down() {

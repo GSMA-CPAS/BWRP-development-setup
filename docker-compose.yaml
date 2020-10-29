@@ -21,19 +21,19 @@ services:
   #
   # ===================================================================
 
-#  nginx-nomad:
-#    container_name: nginx-nomad
-#    image: nginx:1.17.5
-#    restart: always
-#    volumes:
-#      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-#      - ./nginx/dtag:/etc/nginx/certs/dtag
-#      - ./nginx/tmus:/etc/nginx/certs/tmus
-#    ports:
-#      - 80:80
-#      - 443:443
-#    networks:
-#      - nomad
+  nginx-nomad:
+    container_name: nginx-nomad
+    image: nginx:1.17.5
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/dtag:/etc/nginx/certs/dtag
+      - ./nginx/tmus:/etc/nginx/certs/tmus
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - nomad
 
   # ===================================================================
   #
@@ -79,7 +79,7 @@ services:
   #
   # DTAG
   #
-  # =================================================================== 
+  # ===================================================================
 
   blockchain-adapter-dtag:
     build: ./blockchain-adapter/server
@@ -107,7 +107,7 @@ services:
       - ODBA_MYSQL_USER=${DTAG_OFFCHAIN_MYSQL_USER}
       - ODBA_MYSQL_PASSWORD=${DTAG_OFFCHAIN_MYSQL_PASSWORD}
       - ODBA_MYSQL_DATABASE=${DTAG_OFFCHAIN_MYSQL_DB}
-      - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}      
+      - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}
     ports:
       - ${DTAG_OFFCHAIN_REST_PORT}:${DTAG_OFFCHAIN_REST_PORT}
     depends_on:
@@ -126,6 +126,40 @@ services:
       MYSQL_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_PASSWORD}
     ports:
       - 3326:3306
+    networks:
+      - nomad
+
+  webapp-dtag:
+    build: ./ui/webapp
+    container_name: webapp-dtag
+    image: webapp
+    restart: always
+    environment:
+      WEBAPP_MYSQL_PASSWORD: ${DTAG_WEBAPP_DB_PASSWORD}
+      WEBAPP_CA_ADMIN_ENROLLMENT_SECRET: ${DTAG_CA_ADMIN_ENROLLMENT_SECRET}
+      WEBAPP_CA_USER_ENROLLMENT_SECRET: ${DTAG_CA_USER_ENROLLMENT_SECRET}
+    volumes:
+      - ./organizations/dtag/webapp/certs:/app/certs
+      - ./organizations/dtag/webapp/config/custom-environment-variables.json:/webapp/config/custom-environment-variables.json
+      - ./organizations/dtag/webapp/config/production.json:/webapp/config/production.json
+    ports:
+      - 3010:3000
+    depends_on:
+      - webapp-db-dtag
+    networks:
+      - nomad
+
+  webapp-db-dtag:
+    container_name: webapp-db-dtag
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DTAG_WEBAPP_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DTAG_WEBAPP_DB_NAME}
+      MYSQL_USER: ${DTAG_WEBAPP_DB_USER}
+      MYSQL_PASSWORD: ${DTAG_WEBAPP_DB_PASSWORD}
+    ports:
+      - 3366:3306
     networks:
       - nomad
 
@@ -247,6 +281,7 @@ services:
   # TMUS
   #
   # ===================================================================
+
   blockchain-adapter-tmus:
     build: ./blockchain-adapter/server
     container_name: blockchain-adapter-tmus
@@ -273,11 +308,11 @@ services:
       - ODBA_MYSQL_USER=${TMUS_OFFCHAIN_MYSQL_USER}
       - ODBA_MYSQL_PASSWORD=${TMUS_OFFCHAIN_MYSQL_PASSWORD}
       - ODBA_MYSQL_DATABASE=${TMUS_OFFCHAIN_MYSQL_DB}
-      - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}      
+      - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}
     ports:
       - ${TMUS_OFFCHAIN_REST_PORT}:${TMUS_OFFCHAIN_REST_PORT}
     depends_on:
-      - offchain-db-tmus 
+      - offchain-db-tmus
     networks:
       - nomad
 
@@ -292,6 +327,40 @@ services:
       MYSQL_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_PASSWORD}
     ports:
       - 3316:3306
+    networks:
+      - nomad
+
+  webapp-tmus:
+    build: ./ui/webapp
+    container_name: webapp-tmus
+    image: webapp
+    restart: always
+    environment:
+      WEBAPP_MYSQL_PASSWORD: ${TMUS_WEBAPP_DB_PASSWORD}
+      WEBAPP_CA_ADMIN_ENROLLMENT_SECRET: ${TMUS_CA_ADMIN_ENROLLMENT_SECRET}
+      WEBAPP_CA_USER_ENROLLMENT_SECRET: ${TMUS_CA_USER_ENROLLMENT_SECRET}
+    volumes:
+      - ./organizations/tmus/webapp/certs:/app/certs
+      - ./organizations/tmus/webapp/config/custom-environment-variables.json:/webapp/config/custom-environment-variables.json
+      - ./organizations/tmus/webapp/config/production.json:/webapp/config/production.json
+    ports:
+      - 3020:3000
+    depends_on:
+      - webapp-db-tmus
+    networks:
+      - nomad
+
+  webapp-db-tmus:
+    container_name: webapp-db-tmus
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${TMUS_WEBAPP_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${TMUS_WEBAPP_DB_NAME}
+      MYSQL_USER: ${TMUS_WEBAPP_DB_USER}
+      MYSQL_PASSWORD: ${TMUS_WEBAPP_DB_PASSWORD}
+    ports:
+      - 3367:3306
     networks:
       - nomad
 
