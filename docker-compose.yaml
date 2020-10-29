@@ -89,10 +89,14 @@ services:
     environment:
       - BSA_PORT=${DTAG_BLOCKCHAIN_ADAPTER_PORT}
       - BSA_CCP=./ccp/DTAG.json
+      - BSA_CONFIG_DIR=/app/config/
     ports:
       - ${DTAG_BLOCKCHAIN_ADAPTER_PORT}:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
     depends_on:
       - peer0.dtag.nomad.com
+#TODO: fix uid:gid for write permissions
+#    volumes:
+#      - ./blockchain-adapter/server/config_dtag:/app/config/
     networks:
       - nomad
 
@@ -290,10 +294,14 @@ services:
     environment:
       - BSA_PORT=${TMUS_BLOCKCHAIN_ADAPTER_PORT}
       - BSA_CCP=./ccp/TMUS.json
+      - BSA_CONFIG_DIR=/app/config/
     ports:
       - ${TMUS_BLOCKCHAIN_ADAPTER_PORT}:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
     depends_on:
       - peer0.tmus.nomad.com
+#TODO: fix uid:gid for write permissions
+#    volumes:
+#      - ./blockchain-adapter/server/config_tmus:/app/config/
     networks:
       - nomad
 

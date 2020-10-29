@@ -34,8 +34,6 @@ function setupChaincodes() {
 }
 
 function setupWebapp() {
-  docker-compose restart blockchain-adapter-dtag
-  docker-compose restart blockchain-adapter-tmus
   curl -s -X PUT http://localhost:8081/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-dtag:3333"}' -H "Content-Type: application/json" > /dev/null
   curl -s -X PUT http://localhost:8082/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-tmus:3334"}' -H "Content-Type: application/json" > /dev/null
   echo "setting up webapp"
