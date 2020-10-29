@@ -6,13 +6,14 @@ function printHelp() {
   echo "  nomad.sh setup-explorer"
   echo "  nomad.sh package-chaincode <org> <peer> <version> <version>"
   echo "  nomad.sh install-chaincode <org> <peer> <version>"
-  echo "  nomad.sh approve-chaincode <org> <peer> <version> <sequenz>"
-  echo "  nomad.sh commit-chaincode <org> <peer> <version> <sequenz>"
-  echo "  nomad.sh upgrade-chaincode <org> <peer> <version> <sequenz>"
+  echo "  nomad.sh approve-chaincode <org> <peer> <version> <sequence>"
+  echo "  nomad.sh commit-chaincode <org> <peer> <version> <sequence>"
+  echo "  nomad.sh upgrade-chaincode <org> <peer> <version> <sequence>"
   echo "  nomad.sh update-crl <org>"
   echo "  nomad.sh info <org> <peer>"
   echo "  nomad.sh tty <container-name>"
   echo "  nomad.sh rebuild <name>"
+  echo "  nomad.sh up"
   echo "  nomad.sh down"
   echo
 }
@@ -174,7 +175,12 @@ function down() {
   docker rmi $(docker images dev-peer* -q)
   docker volume prune --force
 }
-
+# Print help when there are no arguments
+if [ "$#" -eq 0 ]
+then
+  printHelp >&2
+  exit 1
+fi
 # Check if the function exists (bash specific)
 if declare -f "$1" > /dev/null
 then
@@ -183,5 +189,6 @@ then
 else
   # Show a helpful error
   echo "'$1' is not a known function name" >&2
+  printHelp >&2
   exit 1
 fi
