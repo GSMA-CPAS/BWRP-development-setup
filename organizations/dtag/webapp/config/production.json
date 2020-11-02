@@ -4,6 +4,12 @@
     "title": "Deutsche Telekom"
   },
 
+  "session": {
+    "cookie": {
+      "secure": false
+    }
+  },
+
   "database": {
     "connection": {
       "host": "webapp-db-dtag",
@@ -22,6 +28,12 @@
       "displayName": "Roaming",
       "config": {
       }
+    }
+  },
+
+  "services": {
+    "SwaggerService": {
+      "enabled": true
     }
   },
 
