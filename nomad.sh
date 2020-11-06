@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source .env
+
 function printHelp() {
   echo "Usage: "
   echo "  nomad.sh setup"
@@ -34,9 +36,16 @@ function setupChaincodes() {
   docker exec -ti cli-gsma cli/utils.sh commitChaincode 1
 }
 
+function setupAdapter() {
+  echo "setting up adapters"
+  curl -X PUT http://${DTAG_OFFCHAIN_COUCHDB_USER}:${DTAG_OFFCHAIN_COUCHDB_PASSWORD}@localhost:5985/_users
+  curl -X PUT http://${TMUS_OFFCHAIN_COUCHDB_USER}:${TMUS_OFFCHAIN_COUCHDB_PASSWORD}@localhost:7985/_users
+  curl -s -X PUT http://localhost:8081/config/offchain-db-adapter -d "{\"restURI\": \"http://${DTAG_OFFCHAIN_COUCHDB_USER}:${DTAG_OFFCHAIN_COUCHDB_PASSWORD}@couchdb-offchain-dtag:5984\"}" -H "Content-Type: application/json" > /dev/null
+  curl -s -X PUT http://localhost:8082/config/offchain-db-adapter -d "{\"restURI\": \"http://${TMUS_OFFCHAIN_COUCHDB_USER}:${TMUS_OFFCHAIN_COUCHDB_PASSWORD}@couchdb-offchain-tmus:5984\"}" -H "Content-Type: application/json" > /dev/null
+
+}
+
 function setupWebapp() {
-  curl -s -X PUT http://localhost:8081/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-dtag:3333"}' -H "Content-Type: application/json" > /dev/null
-  curl -s -X PUT http://localhost:8082/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-tmus:3334"}' -H "Content-Type: application/json" > /dev/null
   echo "setting up webapp"
   docker exec -ti --user nomad webapp-dtag node setup.js
   docker exec -ti --user nomad webapp-tmus node setup.js
