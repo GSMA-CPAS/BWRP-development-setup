@@ -100,39 +100,6 @@ services:
     networks:
       - nomad
 
-  offchain-db-adapter-dtag:
-    build: ./offchain_db_adapter
-    container_name: offchain-db-adapter-dtag
-    image: offchain-db-adapter
-    restart: always
-    environment:
-      - ODBA_MYSQL_SERVER_HOST=offchain-db-dtag
-      - ODBA_MYSQL_SERVER_PORT=3306
-      - ODBA_MYSQL_USER=${DTAG_OFFCHAIN_MYSQL_USER}
-      - ODBA_MYSQL_PASSWORD=${DTAG_OFFCHAIN_MYSQL_PASSWORD}
-      - ODBA_MYSQL_DATABASE=${DTAG_OFFCHAIN_MYSQL_DB}
-      - ODBA_REST_PORT=${DTAG_OFFCHAIN_REST_PORT}
-    ports:
-      - ${DTAG_OFFCHAIN_REST_PORT}:${DTAG_OFFCHAIN_REST_PORT}
-    depends_on:
-      - offchain-db-dtag
-    networks:
-      - nomad
-
-  offchain-db-dtag:
-    container_name: offchain-db-dtag
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DTAG_OFFCHAIN_MYSQL_DB}
-      MYSQL_USER: ${DTAG_OFFCHAIN_MYSQL_USER}
-      MYSQL_PASSWORD: ${DTAG_OFFCHAIN_MYSQL_PASSWORD}
-    ports:
-      - 3326:3306
-    networks:
-      - nomad
-
   webapp-dtag:
     build: ./ui/webapp
     container_name: webapp-dtag
@@ -205,8 +172,8 @@ services:
       - CORE_PEER_PROFILE_ENABLED=true
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb-peer0-dtag:5984
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${DTAG_COUCHDB_USER}
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${DTAG_COUCHDB_PASSWORD}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${DTAG_HLF_COUCHDB_USER}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${DTAG_HLF_COUCHDB_PASSWORD}
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
@@ -235,10 +202,22 @@ services:
     image: hyperledger/fabric-couchdb:${COUCHDB_VERSION}
     restart: always
     environment:
-      - COUCHDB_USER=${DTAG_COUCHDB_USER}
-      - COUCHDB_PASSWORD=${DTAG_COUCHDB_PASSWORD}
+      - COUCHDB_USER=${DTAG_HLF_COUCHDB_USER}
+      - COUCHDB_PASSWORD=${DTAG_HLF_COUCHDB_PASSWORD}
     ports:
       - 5984:5984
+    networks:
+      - nomad
+
+  couchdb-offchain-dtag:
+    container_name: couchdb-offchain-dtag
+    image: hyperledger/fabric-couchdb:${COUCHDB_VERSION}
+    restart: always
+    environment:
+      - COUCHDB_USER=${DTAG_OFFCHAIN_COUCHDB_USER}
+      - COUCHDB_PASSWORD=${DTAG_OFFCHAIN_COUCHDB_PASSWORD}
+    ports:
+      - 5985:5984
     networks:
       - nomad
 
@@ -302,39 +281,6 @@ services:
 #TODO: fix uid:gid for write permissions
 #    volumes:
 #      - ./blockchain-adapter/server/config_tmus:/app/config/
-    networks:
-      - nomad
-
-  offchain-db-adapter-tmus:
-    build: ./offchain_db_adapter
-    container_name: offchain-db-adapter-tmus
-    image: offchain-db-adapter
-    restart: always
-    environment:
-      - ODBA_MYSQL_SERVER_HOST=offchain-db-tmus
-      - ODBA_MYSQL_SERVER_PORT=3306
-      - ODBA_MYSQL_USER=${TMUS_OFFCHAIN_MYSQL_USER}
-      - ODBA_MYSQL_PASSWORD=${TMUS_OFFCHAIN_MYSQL_PASSWORD}
-      - ODBA_MYSQL_DATABASE=${TMUS_OFFCHAIN_MYSQL_DB}
-      - ODBA_REST_PORT=${TMUS_OFFCHAIN_REST_PORT}
-    ports:
-      - ${TMUS_OFFCHAIN_REST_PORT}:${TMUS_OFFCHAIN_REST_PORT}
-    depends_on:
-      - offchain-db-tmus
-    networks:
-      - nomad
-
-  offchain-db-tmus:
-    container_name: offchain-db-tmus
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${TMUS_OFFCHAIN_MYSQL_DB}
-      MYSQL_USER: ${TMUS_OFFCHAIN_MYSQL_USER}
-      MYSQL_PASSWORD: ${TMUS_OFFCHAIN_MYSQL_PASSWORD}
-    ports:
-      - 3316:3306
     networks:
       - nomad
 
@@ -410,8 +356,8 @@ services:
       - CORE_PEER_PROFILE_ENABLED=true
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb-peer0-tmus:5984
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${TMUS_COUCHDB_USER}
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${TMUS_COUCHDB_PASSWORD}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${TMUS_HLF_COUCHDB_USER}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${TMUS_HLF_COUCHDB_PASSWORD}
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
@@ -440,10 +386,22 @@ services:
     image: hyperledger/fabric-couchdb:${COUCHDB_VERSION}
     restart: always
     environment:
-      - COUCHDB_USER=${TMUS_COUCHDB_USER}
-      - COUCHDB_PASSWORD=${TMUS_COUCHDB_PASSWORD}
+      - COUCHDB_USER=${TMUS_HLF_COUCHDB_USER}
+      - COUCHDB_PASSWORD=${TMUS_HLF_COUCHDB_PASSWORD}
     ports:
       - 7984:5984
+    networks:
+      - nomad
+
+  couchdb-offchain-tmus:
+    container_name: couchdb-offchain-tmus
+    image: hyperledger/fabric-couchdb:${COUCHDB_VERSION}
+    restart: always
+    environment:
+      - COUCHDB_USER=${TMUS_OFFCHAIN_COUCHDB_USER}
+      - COUCHDB_PASSWORD=${TMUS_OFFCHAIN_COUCHDB_PASSWORD}
+    ports:
+      - 7985:5984
     networks:
       - nomad
 
@@ -512,8 +470,8 @@ services:
       - CORE_PEER_PROFILE_ENABLED=true
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb-peer0-gsma:5984
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${GSMA_COUCHDB_USER}
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${GSMA_COUCHDB_PASSWORD}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${GSMA_HLF_COUCHDB_USER}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${GSMA_HLF_COUCHDB_PASSWORD}
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
       - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
@@ -542,8 +500,8 @@ services:
     image: hyperledger/fabric-couchdb:${COUCHDB_VERSION}
     restart: always
     environment:
-      - COUCHDB_USER=${GSMA_COUCHDB_USER}
-      - COUCHDB_PASSWORD=${GSMA_COUCHDB_PASSWORD}
+      - COUCHDB_USER=${GSMA_HLF_COUCHDB_USER}
+      - COUCHDB_PASSWORD=${GSMA_HLF_COUCHDB_PASSWORD}
     ports:
       - 8984:5984
     networks:

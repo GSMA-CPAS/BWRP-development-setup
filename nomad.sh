@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source .env
+
 function printHelp() {
   echo "Usage: "
   echo "  nomad.sh setup"
@@ -34,9 +36,46 @@ function setupChaincodes() {
   docker exec -ti cli-gsma cli/utils.sh commitChaincode 1
 }
 
-function setupWebapp() {
-  curl -s -X PUT http://localhost:8081/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-dtag:3333"}' -H "Content-Type: application/json" > /dev/null
-  curl -s -X PUT http://localhost:8082/config/offchain-db-adapter -d '{"restURI": "http://offchain-db-adapter-tmus:3334"}' -H "Content-Type: application/json" > /dev/null
+function setupAdapterSingle(){
+  COUCHDB_USER=$1
+  COUCHDB_PASS=$2
+  COUCHDB_HOST=$3
+  COUCHDB_PORT=$4
+  BSA_HOST=$5
+  BSA_PORT=$6
+  COUCHDB_INTERNAL_HOST=$7
+  COUCHDB_INTERNAL_PORT=$8
+  echo "configuring blockchain adapter on $BSA_HOST:$BSA_PORT to use couchdb server ${COUCHDB_INTERNAL_HOST}..."
+  curl -X PUT http://${COUCHDB_USER}:${COUCHDB_PASS}@${COUCHDB_HOST}:${COUCHDB_PORT}/_users
+
+  for value in {1..5}
+  do
+    echo "try $value of 5: seting couchdb config:"
+    curl -s -X PUT http://${BSA_HOST}:${BSA_PORT}/config/offchain-db -d "{\"URI\": \"http://${COUCHDB_USER}:${COUCHDB_PASS}@${COUCHDB_INTERNAL_HOST}:${COUCHDB_INTERNAL_PORT}\"}" -H "Content-Type: application/json"
+    # read back to verify
+    RESPONSE=$(curl -s http://${BSA_HOST}:${BSA_PORT}/config/offchain-db)
+    echo ""
+    if echo $RESPONSE | grep -i "error" > /dev/null; then 
+      echo $RESPONSE
+      echo "Error: failed to set endpoint, retrying..."
+    else
+      echo "Sucess"
+      return
+    fi 
+    echo "will retry in 5s"
+    sleep 5
+  done
+  echo "failed to set up endpoint. giving up."
+  exit 1
+}
+
+function setupAdapters() {
+  echo "setting up adapters"
+  setupAdapterSingle ${DTAG_OFFCHAIN_COUCHDB_USER} ${DTAG_OFFCHAIN_COUCHDB_PASSWORD} localhost 5985 localhost 8081 couchdb-offchain-dtag 5984
+  setupAdapterSingle ${TMUS_OFFCHAIN_COUCHDB_USER} ${TMUS_OFFCHAIN_COUCHDB_PASSWORD} localhost 7985 localhost 8082 couchdb-offchain-tmus 5984
+}
+
+function setupWebapps() {
   echo "setting up webapp"
   docker exec -ti --user nomad webapp-dtag node setup.js
   docker exec -ti --user nomad webapp-tmus node setup.js
@@ -73,7 +112,8 @@ function setup() {
   if [ $# -eq 0 ]; then
     setupChannel
     setupChaincodes
-    setupWebapp
+    setupAdapters
+    setupWebapps
   else
     case $1 in
       dtag)
