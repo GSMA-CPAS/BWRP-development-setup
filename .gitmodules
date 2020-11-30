@@ -8,3 +8,7 @@
 	path = ui
 	url = https://github.com/GSMA-CPAS/BWRP-UI
 	branch = master
+[submodule "common-adapter"]
+	path = common-adapter
+	url = https://github.com/GSMA-CPAS/BWRP-common-adapter
+	branch = master
