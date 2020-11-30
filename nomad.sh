@@ -188,9 +188,44 @@ function tty() {
 }
 
 
-function build() {
+function build_old() {
   HASH=$(cat .git/modules/blockchain-adapter/HEAD || echo "NO_HEAD" | head -1 | cut -f1)
   docker-compose build --build-arg BSA_COMMIT_HASH="$HASH" $1 || exit 1
+}
+
+function build() {
+  HASH=$(cat .git/modules/blockchain-adapter/HEAD || echo "NO_HEAD" | head -1 | cut -f1)
+  HASH2=$(cat .git/modules/common-adapter/HEAD || echo "NO_HEAD" | head -1 | cut -f1)
+  docker-compose build --build-arg BSA_COMMIT_HASH="$HASH" --build-arg COMMIT_HASH="$HASH2"  $1 || exit 1
+  mkdir -p ${DTAG_MONGO_PV_PATH}
+  echo "db.createUser(
+    {
+        user: \"${DTAG_MONGO_USER}\",
+        pwd: \"${DTAG_MONGO_USERPW}\",
+        roles: [
+            {
+                role: \"readWrite\",
+                db: \"commondb\"
+            }
+        ]
+    }
+);
+" > ${DTAG_MONGO_PV_PATH}mongo-init.js
+
+  mkdir -p ${TMUS_MONGO_PV_PATH}
+  echo "db.createUser(
+    {
+        user: \"${TMUS_MONGO_USER}\",
+        pwd: \"${TMUS_MONGO_USERPW}\",
+        roles: [
+            {
+                role: \"readWrite\",
+                db: \"commondb\"
+            }
+        ]
+    }
+);
+" > ${TMUS_MONGO_PV_PATH}mongo-init.js
 }
 
 function rebuild() {
