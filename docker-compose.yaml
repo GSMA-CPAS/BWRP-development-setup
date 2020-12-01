@@ -283,7 +283,7 @@ services:
     environment:
       - LOG_LEVEL=${DTAG_LOG_LEVEL}
       - DB_URL=mongodb://${DTAG_MONGO_USER}:${DTAG_MONGO_USERPW}@CADB-dtag:27017/commondb?authSource=commondb
-      - BLOCKCHAIN_ADAPTER_URL=${DTAG_BLOCKCHAIN_ADAPTER_URL}
+      - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-dtag:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
     depends_on:
       - CADB-dtag
     ports:
@@ -500,7 +500,7 @@ services:
     environment:
       - LOG_LEVEL=${TMUS_LOG_LEVEL}
       - DB_URL=mongodb://${TMUS_MONGO_USER}:${TMUS_MONGO_USERPW}@CADB-tmus:27017/commondb?authSource=commondb
-      - BLOCKCHAIN_ADAPTER_URL=${TMUS_BLOCKCHAIN_ADAPTER_URL}
+      - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-tmus:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
       - 'BLOCKCHAIN_ADAPTER_WEBHOOKS=[{"eventName": "STORE:DOCUMENTHASH", "callbackUrl": "http://common-adapter-tmus:3000/api/v1/contracts/event/"},{"eventName": "STORE:SIGNATURE", "callbackUrl": "http://common-adapter-tmus:3000/api/v1/contracts/event/"}]'
     depends_on:
       - CADB-tmus
