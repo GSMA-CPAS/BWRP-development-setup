@@ -46,7 +46,8 @@ echo " > GET /api/v1/contracts/ [get list of All Contract on DTAG]"
 get_request "http://dtag.poc.com.local:$DTAG_COMMON_ADAPTER_PORT/api/v1/contracts/" 
 echo
 read -n 1 -s -r -p "Press any key to continue ..."
-
+echo
+echo
 
 
 echo " 2) #################### DTAG ####################"
