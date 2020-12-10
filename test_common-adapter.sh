@@ -41,7 +41,7 @@ echo
 read -n 1 -s -r -p "Press any key to continue ..."
 echo
 echo
-i
+
 
 echo " 2) #################### DTAG ####################"
 echo " > POST /api/v1/contracts/ [create new DRFAT Contract]"
