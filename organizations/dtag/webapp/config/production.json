@@ -51,13 +51,9 @@
         }
       }
     },
-    "BlockchainAdapter": {
+    "CommonAdapter": {
       "config": {
-        "url": "http://blockchain-adapter-dtag:8081",
-        "webhooks": [
-          {"eventName": "STORE:DOCUMENTHASH", "callbackUrl": "http://webapp-dtag:3000/api/v1/blockchain/documents/events"},
-          {"eventName": "STORE:SIGNATURE", "callbackUrl": "http://webapp-dtag:3000/api/v1/blockchain/signatures/events"}
-        ]
+        "url": "http://common-adapter-dtag:3000"
       }
     }
   }

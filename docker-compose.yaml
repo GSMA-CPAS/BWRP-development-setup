@@ -284,7 +284,7 @@ services:
       - LOG_LEVEL=${DTAG_LOG_LEVEL}
       - DB_URL=mongodb://${DTAG_MONGO_USER}:${DTAG_MONGO_USERPW}@cadb-dtag:27017/commondb?authSource=commondb
       - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-dtag:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
-      - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH"]'
+      - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
       - SELF_HOST=http://common-adapter-dtag:3000
     depends_on:
       - cadb-dtag
@@ -503,7 +503,7 @@ services:
       - LOG_LEVEL=${TMUS_LOG_LEVEL}
       - DB_URL=mongodb://${TMUS_MONGO_USER}:${TMUS_MONGO_USERPW}@cadb-tmus:27017/commondb?authSource=commondb
       - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-tmus:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
-      - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH"]'
+      - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
       - SELF_HOST=http://common-adapter-tmus:3000
     depends_on:
       - cadb-tmus
