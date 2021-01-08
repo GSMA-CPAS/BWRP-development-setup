@@ -211,7 +211,7 @@ function build() {
     }
 );
 db.contracts.createIndex({ id: 1 }, { unique: true });
-db.contracts.createIndex({documentId: 1}, {unique: true, partialFilterExpression: {documentId: {\$type: 'string'}}});
+db.contracts.createIndex({referenceId: 1}, {unique: true, partialFilterExpression: {referenceId: {\$type: 'string'}}});
 " > ${DTAG_MONGO_PV_PATH}mongo-init.js
 
   mkdir -p ${TMUS_MONGO_PV_PATH}
@@ -228,7 +228,7 @@ db.contracts.createIndex({documentId: 1}, {unique: true, partialFilterExpression
     }
 );
 db.contracts.createIndex({ id: 1 }, { unique: true });
-db.contracts.createIndex({documentId: 1}, {unique: true, partialFilterExpression: {documentId: {\$type: 'string'}}});
+db.contracts.createIndex({referenceId: 1}, {unique: true, partialFilterExpression: {referenceId: {\$type: 'string'}}});
 " > ${TMUS_MONGO_PV_PATH}mongo-init.js
 }
 

@@ -286,6 +286,7 @@ services:
       - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-dtag:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
       - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH"]'
       - SELF_HOST=http://common-adapter-dtag:3000
+      - DEACTIVATE_BLOCKCHAIN_DOCUMENT_DELETE=TRUE
     depends_on:
       - cadb-dtag
     ports:
@@ -505,6 +506,7 @@ services:
       - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-tmus:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
       - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH"]'
       - SELF_HOST=http://common-adapter-tmus:3000
+      - DEACTIVATE_BLOCKCHAIN_DOCUMENT_DELETE=TRUE
     depends_on:
       - cadb-tmus
     ports:
