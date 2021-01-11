@@ -281,7 +281,7 @@ services:
     image: common-adapter
     restart: always
     environment:
-      - LOG_LEVEL=${DTAG_LOG_LEVEL}
+      - LOG_LEVEL=${DTAG_COMMON_ADAPTER_LOG_LEVEL}
       - DB_URL=mongodb://${DTAG_MONGO_USER}:${DTAG_MONGO_USERPW}@cadb-dtag:27017/commondb?authSource=commondb
       - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-dtag:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
       - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
@@ -500,7 +500,7 @@ services:
     image: common-adapter
     restart: always
     environment:
-      - LOG_LEVEL=${TMUS_LOG_LEVEL}
+      - LOG_LEVEL=${TMUS_COMMON_ADAPTER_LOG_LEVEL}
       - DB_URL=mongodb://${TMUS_MONGO_USER}:${TMUS_MONGO_USERPW}@cadb-tmus:27017/commondb?authSource=commondb
       - BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-tmus:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
       - 'BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
