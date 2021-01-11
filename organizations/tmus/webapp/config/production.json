@@ -51,13 +51,9 @@
         }
       }
     },
-    "BlockchainAdapter": {
+    "CommonAdapter": {
       "config": {
-        "url": "http://blockchain-adapter-tmus:8082",
-        "webhooks": [
-          {"eventName": "STORE:DOCUMENTHASH", "callbackUrl": "http://webapp-tmus:3000/api/v1/blockchain/documents/events"},
-          {"eventName": "STORE:SIGNATURE", "callbackUrl": "http://webapp-tmus:3000/api/v1/blockchain/signatures/events"}
-        ]
+        "url": "http://common-adapter-tmus:3000"
       }
     }
   }
