@@ -12,3 +12,6 @@
 	path = common-adapter
 	url = https://github.com/GSMA-CPAS/BWRP-common-adapter
 	branch = master
+[submodule "calculator"]
+	path = calculator
+	url = https://github.com/GSMA-CPAS/BWRP-calculation-service.git
