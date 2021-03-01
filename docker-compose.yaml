@@ -285,7 +285,7 @@ services:
       - COMMON_ADAPTER_DB_URL=mongodb://${DTAG_MONGO_USER}:${DTAG_MONGO_USERPW}@cadb-dtag:27017/commondb?authSource=commondb
       - COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-dtag:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
-      - COMMON_ADAPTER_SELF_HOST=http://common-adapter-dtag:3030
+      - COMMON_ADAPTER_SELF_HOST=http://common-adapter-dtag:3000
       - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:6060
     depends_on:
       - cadb-dtag
@@ -505,7 +505,7 @@ services:
       - COMMON_ADAPTER_DB_URL=mongodb://${TMUS_MONGO_USER}:${TMUS_MONGO_USERPW}@cadb-tmus:27017/commondb?authSource=commondb
       - COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-tmus:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
-      - COMMON_ADAPTER_SELF_HOST=http://common-adapter-tmus:3040
+      - COMMON_ADAPTER_SELF_HOST=http://common-adapter-tmus:3000
       - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:6060
     depends_on:
       - cadb-tmus
