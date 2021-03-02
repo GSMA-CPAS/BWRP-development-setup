@@ -286,7 +286,7 @@ services:
       - COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-dtag:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
       - COMMON_ADAPTER_SELF_HOST=http://common-adapter-dtag:3000
-      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:6060
+      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:8080
     depends_on:
       - cadb-dtag
     ports:
@@ -506,7 +506,7 @@ services:
       - COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-tmus:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:DOCUMENTHASH", "STORE:SIGNATURE"]'
       - COMMON_ADAPTER_SELF_HOST=http://common-adapter-tmus:3000
-      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:6060
+      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:8080
     depends_on:
       - cadb-tmus
     ports:
