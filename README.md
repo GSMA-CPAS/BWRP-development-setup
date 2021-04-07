@@ -48,7 +48,9 @@ nameserver 8.8.8.8
 $ ./nomad.sh up
 </pre>
 
-Wait until cluster stable appears
+Wait "a while". 
+
+TODO: improve waiting duration
 
 ### (6) Setup channel and chaincode
 

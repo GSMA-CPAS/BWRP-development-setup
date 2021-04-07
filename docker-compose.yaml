@@ -269,7 +269,6 @@ services:
       - MONGO_INITDB_DATABASE=commondb
     volumes:
       - ${DTAG_MONGO_PV_PATH}/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-      - ${DTAG_MONGO_PV_PATH}:/data/db
     ports:
       - ${DTAG_MONGO_PORT}:27017
     networks:
@@ -489,7 +488,6 @@ services:
       - MONGO_INITDB_DATABASE=commondb
     volumes:
       - ${TMUS_MONGO_PV_PATH}/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-      - ${TMUS_MONGO_PV_PATH}:/data/db
     ports:
       - ${TMUS_MONGO_PORT}:27017
     networks:
