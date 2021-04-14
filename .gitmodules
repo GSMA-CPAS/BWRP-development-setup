@@ -15,3 +15,6 @@
 [submodule "calculator"]
 	path = calculator
 	url = https://github.com/GSMA-CPAS/BWRP-calculation-service.git
+[submodule "discrepancy-service"]
+	path = discrepancy-service
+	url = https://github.com/GSMA-CPAS/BWRP-discrepancy-service.git

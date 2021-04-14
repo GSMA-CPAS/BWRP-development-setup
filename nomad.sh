@@ -243,7 +243,7 @@ function up() {
 }
 
 function down() {
-  filter='hyperledger\|dev-peer\|mysql\|nginx\|webapp\|offchain\|blockchain-adapter\|cadb\|common-adapter\|calculator-service'
+  filter='hyperledger\|dev-peer\|mysql\|nginx\|webapp\|offchain\|blockchain-adapter\|cadb\|common-adapter\|calculator-service\|discrepancy-service'
   #docker stop $(docker ps -a -q)
   docker stop $(docker ps -a | grep $filter | awk '{print $1}')
   #docker kill $(docker ps -q)
