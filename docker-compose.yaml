@@ -696,4 +696,3 @@ services:
       - 6061:8080
     networks:
       - nomad
-
