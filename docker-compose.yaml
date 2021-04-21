@@ -286,10 +286,41 @@ services:
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:PAYLOADLINK", "STORE:SIGNATURE"]'
       - COMMON_ADAPTER_SELF_HOST=http://common-adapter-dtag:3000
       - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:8080
+      - COMMON_ADAPTER_DISCREPANCY_SERVICE_URL=http://discrepancy-service-dtag:8080
     depends_on:
       - cadb-dtag
     ports:
       - ${DTAG_COMMON_ADAPTER_PORT}:3000
+    networks:
+      - nomad
+
+  dsdb-dtag:
+    container_name: dsdb-dtag
+    image: mongo:${MONGO_VERSION}
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DTAG_DSDB_ROOT}
+      - MONGO_INITDB_ROOT_PASSWORD=${DTAG_DSDB_ROOTPW}
+      - MONGO_INITDB_DATABASE=nomad
+    volumes:
+      - ${DTAG_DSDB_PV_PATH}/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ${DTAG_DSDB_PV_PATH}:/data/db
+    ports:
+      - ${DTAG_DSDB_PORT}:27017
+    networks:
+      - nomad
+
+  discrepancy-service-dtag:
+    container_name: discrepancy-service-dtag
+    build: discrepancy-service
+    image: discrepancy-service
+    restart: always
+    environment:
+      - MONGO_CONN_URL=mongodb://dsdb-dtag:27017
+    depends_on:
+      - dsdb-dtag
+    ports:
+      - ${DTAG_DISCREPANCY_PORT}:8080
     networks:
       - nomad
 
@@ -505,10 +536,41 @@ services:
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:PAYLOADLINK", "STORE:SIGNATURE"]'
       - COMMON_ADAPTER_SELF_HOST=http://common-adapter-tmus:3000
       - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:8080
+      - COMMON_ADAPTER_DISCREPANCY_SERVICE_URL=http://discrepancy-service-tmus:8080
     depends_on:
       - cadb-tmus
     ports:
       - ${TMUS_COMMON_ADAPTER_PORT}:3000
+    networks:
+      - nomad
+
+  dsdb-tmus:
+    container_name: dsdb-tmus
+    image: mongo:${MONGO_VERSION}
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${TMUS_DSDB_ROOT}
+      - MONGO_INITDB_ROOT_PASSWORD=${TMUS_DSDB_ROOTPW}
+      - MONGO_INITDB_DATABASE=nomad
+    volumes:
+      - ${TMUS_DSDB_PV_PATH}/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ${TMUS_DSDB_PV_PATH}:/data/db
+    ports:
+      - ${TMUS_DSDB_PORT}:27017
+    networks:
+      - nomad
+
+  discrepancy-service-tmus:
+    container_name: discrepancy-service-tmus
+    build: discrepancy-service
+    image: discrepancy-service
+    restart: always
+    environment:
+      - MONGO_CONN_URL=mongodb://dsdb-tmus:27017
+    depends_on:
+      - dsdb-tmus
+    ports:
+      - ${TMUS_DISCREPANCY_PORT}:8080
     networks:
       - nomad
 
@@ -634,4 +696,3 @@ services:
       - 6061:8080
     networks:
       - nomad
-

@@ -5,3 +5,5 @@ organizations/*/cli/hybrid-*.tar.gz
 organizations/*/cli/utils.sh
 CADB-DTAG/
 CADB-TMUS/
+DSDB-DTAG/
+DSDB-TMUS/
