@@ -320,7 +320,7 @@ services:
     depends_on:
       - dsdb-dtag
     ports:
-      - 8181:8080
+      - ${DTAG_DISCREPANCY_PORT}:8080
     networks:
       - nomad
 
@@ -570,7 +570,7 @@ services:
     depends_on:
       - dsdb-tmus
     ports:
-      - 8282:8080
+      - ${TMUS_DISCREPANCY_PORT}:8080
     networks:
       - nomad
 
