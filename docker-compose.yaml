@@ -686,13 +686,3 @@ services:
       - 6060:8080
     networks:
       - nomad
-
-  discrepancy-service:
-    container_name: discrepancy-service
-    build: discrepancy-service/
-    image: discrepancy-service:latest
-    restart: always
-    ports:
-      - 6061:8080
-    networks:
-      - nomad
