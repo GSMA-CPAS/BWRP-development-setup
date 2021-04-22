@@ -285,7 +285,7 @@ services:
       - COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-dtag:${DTAG_BLOCKCHAIN_ADAPTER_PORT}
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:PAYLOADLINK", "STORE:SIGNATURE"]'
       - COMMON_ADAPTER_SELF_HOST=http://common-adapter-dtag:3000
-      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:8080
+      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service-dtag:8080
       - COMMON_ADAPTER_DISCREPANCY_SERVICE_URL=http://discrepancy-service-dtag:8080
     depends_on:
       - cadb-dtag
@@ -321,6 +321,16 @@ services:
       - dsdb-dtag
     ports:
       - ${DTAG_DISCREPANCY_PORT}:8080
+    networks:
+      - nomad
+
+  calculator-service-dtag:
+    container_name: calculator-service-dtag
+    build: calculator
+    image: calculator-service:latest
+    restart: always
+    ports:
+      - ${DTAG_CS_PORT}:8080
     networks:
       - nomad
 
@@ -535,7 +545,7 @@ services:
       - COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_URL=http://blockchain-adapter-tmus:${TMUS_BLOCKCHAIN_ADAPTER_PORT}
       - 'COMMON_ADAPTER_BLOCKCHAIN_ADAPTER_WEBHOOK_EVENTS=["STORE:PAYLOADLINK", "STORE:SIGNATURE"]'
       - COMMON_ADAPTER_SELF_HOST=http://common-adapter-tmus:3000
-      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service:8080
+      - COMMON_ADAPTER_CALCULATION_SERVICE_URL=http://calculator-service-tmus:8080
       - COMMON_ADAPTER_DISCREPANCY_SERVICE_URL=http://discrepancy-service-tmus:8080
     depends_on:
       - cadb-tmus
@@ -571,6 +581,16 @@ services:
       - dsdb-tmus
     ports:
       - ${TMUS_DISCREPANCY_PORT}:8080
+    networks:
+      - nomad
+
+  calculator-service-tmus:
+    container_name: calculator-service-tmus
+    build: calculator
+    image: calculator-service:latest
+    restart: always
+    ports:
+      - ${TMUS_CS_PORT}:8080
     networks:
       - nomad
 
@@ -674,15 +694,5 @@ services:
       - ./organizations/gsma/cli:/opt/gopath/src/github.com/hyperledger/fabric/peer/cli
     depends_on:
       - peer0.gsma.nomad.com
-    networks:
-      - nomad
-
-  calculator-service:
-    container_name: calculator-service
-    build: calculator
-    image: calculator-service:latest
-    restart: always
-    ports:
-      - 6060:8080
     networks:
       - nomad
