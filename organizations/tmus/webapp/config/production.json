@@ -38,6 +38,11 @@
   },
 
   "backendAdapters": {
+    "UserManagementAdapter": {
+      "config": {
+        "initialAdminPassword": "admin"
+      }
+    },
     "CertAuthAdapter": {
       "config": {
         "url": "http://ca-tmus:7054",
@@ -48,6 +53,14 @@
         "tlsOptions": {
           "trustedRoots": [],
           "verify": false
+        },
+        "hsm": {
+          "enabled": false,
+          "lib": "/usr/local/lib/softhsm/libsofthsm2.so",
+          "pin": "71811222",
+          "slot": 0,
+          "usertype": 1,
+          "readwrite": false
         }
       }
     },

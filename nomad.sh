@@ -36,6 +36,19 @@ function setupChaincodes() {
   docker exec -ti cli-gsma cli/utils.sh commitChaincode 1
 }
 
+function request {
+    RET=$(curl -s -S -X $1 -H "Content-Type: application/json" -d "$2" "$3")
+    echo $RET
+    echo $RET | grep -i "error" > /dev/null && echo $RET > /dev/stderr && exit 1 || :
+}
+
+function setupSignCerts() {
+  echo "> storing root cert on DTAG"
+  request PUT "[\"$(cat crypto-config/peerOrganizations/dtag.nomad.com/ca/ca.dtag.nomad.com-cert.pem | awk 1 ORS='\\n' )\"]" http://localhost:$DTAG_BLOCKCHAIN_ADAPTER_PORT/config/certificates/root
+  echo "> storing root cert on TMUS"
+  request PUT "[\"$(cat crypto-config/peerOrganizations/tmus.nomad.com/ca/ca.tmus.nomad.com-cert.pem | awk 1 ORS='\\n' )\"]" http://localhost:$TMUS_BLOCKCHAIN_ADAPTER_PORT/config/certificates/root
+}
+
 function setupAdapterSingle(){
   COUCHDB_USER=$1
   COUCHDB_PASS=$2
@@ -55,13 +68,13 @@ function setupAdapterSingle(){
     # read back to verify
     RESPONSE=$(curl -s http://${BSA_HOST}:${BSA_PORT}/config/offchain-db)
     echo ""
-    if echo $RESPONSE | grep -i "error" > /dev/null; then 
+    if echo $RESPONSE | grep -i "error" > /dev/null; then
       echo $RESPONSE
       echo "Error: failed to set endpoint, retrying..."
     else
       echo "Sucess"
       return
-    fi 
+    fi
     echo "will retry in 5s"
     sleep 5
   done
@@ -113,6 +126,7 @@ function setup() {
     setupChannel
     setupChaincodes
     setupAdapters
+    setupSignCerts
     setupWebapps
   else
     case $1 in
