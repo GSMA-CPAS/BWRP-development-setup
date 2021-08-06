@@ -25,8 +25,17 @@ $ vi .env #add passwords etc.
 ### (3) Update ``/etc/hosts``. Replace 192.168.2.119 with your host ip
 
 <pre>
-192.168.2.119  dtag.poc.com.local
-192.168.2.119  tmus.poc.com.local
+# frontends
+127.0.0.1       dtag.poc.com.local
+127.0.0.1       tmus.poc.com.local
+
+# peers
+127.0.0.1       peer0.dtag.nomad.com
+127.0.0.1       peer0.tmus.nomad.com
+127.0.0.1       peer0.gsma.nomad.com
+
+# orderer
+127.0.0.1       orderer.nomad.com
 </pre>
 
 ### (4) Build required images
