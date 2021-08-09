@@ -22,7 +22,7 @@ $ cp .env-template .env
 $ vi .env #add passwords etc.
 </pre>
 
-### (3) Update ``/etc/hosts``. Replace 192.168.2.119 with your host ip
+### (3) Update ``/etc/hosts``.
 
 <pre>
 # frontends
