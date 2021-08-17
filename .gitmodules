@@ -19,3 +19,4 @@
 [submodule "discrepancy-service"]
 	path = discrepancy-service
 	url = https://github.com/GSMA-CPAS/BWRP-discrepancy-service.git
+	branch = master
