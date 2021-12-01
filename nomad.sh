@@ -72,7 +72,7 @@ function setupAdapterSingle(){
       echo $RESPONSE
       echo "Error: failed to set endpoint, retrying..."
     else
-      echo "Sucess"
+      echo "Success"
       return
     fi
     echo "will retry in 5s"
@@ -126,7 +126,7 @@ function setup() {
     setupChannel
     setupChaincodes
     setupAdapters
-    setupSignCerts
+    #setupSignCerts
     setupWebapps
   else
     case $1 in
