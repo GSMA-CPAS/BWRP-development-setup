@@ -126,7 +126,7 @@ function setup() {
     setupChannel
     setupChaincodes
     setupAdapters
-    #setupSignCerts
+    setupSignCerts
     setupWebapps
   else
     case $1 in
