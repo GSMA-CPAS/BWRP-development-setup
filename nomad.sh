@@ -44,9 +44,9 @@ function request {
 
 function setupSignCerts() {
   echo "> storing root cert on DTAG"
-  request PUT "[\"$(cat crypto-config/peerOrganizations/dtag.nomad.com/ca/ca.dtag.nomad.com-cert.pem | awk 1 ORS='\\n' )\"]" http://localhost:$DTAG_BLOCKCHAIN_ADAPTER_PORT/config/certificates/root
+  request PUT "[\"$(cat crypto-config/peerOrganizations/dtag.nomad.com/ca/ca.dtag.nomad.com-cert.pem | awk 1 ORS='\\n' )\"]" http://localhost:$DTAG_BLOCKCHAIN_ADAPTER_PORT/certificate/root
   echo "> storing root cert on TMUS"
-  request PUT "[\"$(cat crypto-config/peerOrganizations/tmus.nomad.com/ca/ca.tmus.nomad.com-cert.pem | awk 1 ORS='\\n' )\"]" http://localhost:$TMUS_BLOCKCHAIN_ADAPTER_PORT/config/certificates/root
+  request PUT "[\"$(cat crypto-config/peerOrganizations/tmus.nomad.com/ca/ca.tmus.nomad.com-cert.pem | awk 1 ORS='\\n' )\"]" http://localhost:$TMUS_BLOCKCHAIN_ADAPTER_PORT/certificate/root
 }
 
 function setupAdapterSingle(){
@@ -72,7 +72,7 @@ function setupAdapterSingle(){
       echo $RESPONSE
       echo "Error: failed to set endpoint, retrying..."
     else
-      echo "Sucess"
+      echo "Success"
       return
     fi
     echo "will retry in 5s"
